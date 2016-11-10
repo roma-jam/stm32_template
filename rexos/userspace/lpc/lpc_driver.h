@@ -15,13 +15,6 @@
 extern const REX __LPC_CORE;
 extern const REX __LPC_ETH;
 
-#if !(MONOLITH_USB)
-extern const REX __LPC_USB;
-#endif
-#if !(MONOLITH_UART)
-extern const REX __LPC_UART;
-#endif
-
 //------------------------------------------------- GPIO ---------------------------------------------------------------------
 typedef enum {
     LPC_PIN_ENABLE = IPC_USER,
@@ -203,14 +196,22 @@ typedef enum {
     RESET_REASON_UNKNOWN
 } RESET_REASON;
 
-//------------------------------------------------- UART ---------------------------------------------------------------------
+//-------------------------------------------------- I2C ---------------------------------------------------------------------
+typedef enum {
+    I2C_0,
+    I2C_1
+} I2C_PORT;
 
+//------------------------------------------------- UART ---------------------------------------------------------------------
 typedef enum {
     UART_0 = 0,
     UART_1,
     UART_2,
     UART_3,
     UART_4,
+    UART_5,
+    UART_6,
+    UART_7,
     UART_MAX
 }UART_PORT;
 

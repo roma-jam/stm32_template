@@ -46,6 +46,8 @@ unavailable, another HPET timer can be used for RTC emulation
   * HTTP Server (beta)
   * TLS 1.2 Server (beta)
   * SD/MMC host stack
+  * FAT16 file system
+  * Block error rate layer
 - Error handling:
   * each process has own error processing
   * kernel panic with memory dump on critical errors. Restart system if configured
@@ -63,16 +65,17 @@ unavailable, another HPET timer can be used for RTC emulation
   * cortex-m4
   * ARM7
 - Drivers:
-  * core (PIN/GPIO, UART, TIMER, POWER): STM32F1, STM32F2, STM32F4, STM32L0, LPC11Uxx, LPC18xx
-  * rtc: STM32F1, STM32F2, STM32F4, STM32L0
-  * wdt: STM32F1, STM32F2, STM32F4, STM32L0
+  * core (PIN/GPIO, UART, TIMER, POWER): STM32F0, STM32F1, STM32F2, STM32F4, STM32L0, LPC11Uxx, LPC18xx
+  * rtc: STM32F0, STM32F1, STM32F2, STM32F4, STM32L0
+  * wdt: STM32F0, STM32F1, STM32F2, STM32F4, STM32L0
   * EEPROM: LPC11Uxx, STM32L0
   * I2C: LPC1Uxx, LPC18xx
   * ADC: STM32F1, STM32L0
   * DAC: STM32F1, STM32L0
-  * USB: STM32F1_CL, STM32L0, LPC11Uxx, LPC18xx
+  * USB: STM32F1_CL, STM32F0, STM32L0, LPC11Uxx, LPC18xx
   * ETH: STM32F1, LPC18xx
   * SD/MMC: LPC18xx
+  * flash: LPC18xx
   * МЭЛТ mt12864j LCD display
 
 Cortex-M3 features:
@@ -87,6 +90,23 @@ ARM7 features:
 
 History
 =======
+0.4.9
+- LPC18xx flash storage interface
+- Block error rate for filesystem over flash support
+- FAT16 minor fixes
+
+0.4.8
+- Support of FAT16 file system: read, write, format
+- FAT16 VFS drafts
+
+0.4.7
+- STM32F0 USB driver
+- STM32F0 UART IO mode driver
+- USB drivers now part of CORE drivers, no more dedicated SYS_OBJ_USB handle
+
+0.4.6
+- STM32 F0 support
+- STM32 HAL interface for clocks query
 
 0.4.5
 - LPC18xx power profiling support

@@ -19,7 +19,7 @@
 //check user adresses. Require few tacts, but making kernel calls much safer
 #define KERNEL_ADDRESS_CHECKING                     0
 //some kernel statistics (stack, mem, etc). Decrease perfomance in any object creation.
-#define KERNEL_PROFILING                            1
+#define KERNEL_PROFILING                            0
 //Kernel assertions, halt on fatal error, disable power save mode
 //Don't forget to turn off in production.
 #define KERNEL_DEVELOPER_MODE                       1

@@ -12,18 +12,7 @@
 #include "../../userspace/object.h"
 #include "stm32_rtc.h"
 #include "stm32_wdt.h"
-#include "stm32_uart.h"
-#include "stm32_adc.h"
-#include "stm32_dac.h"
 #include "stm32_eep.h"
-
-#if (MONOLITH_USB)
-#ifdef STM32F10X_CL
-#include "stm32_otg.h"
-#else
-#include "stm32_usb.h"
-#endif //STM32F10X_CL
-#endif
 
 void stm32_core();
 
@@ -67,11 +56,11 @@ void stm32_core_loop(CORE* core)
             stm32_wdt_request(&ipc);
             break;
 #endif //STM32_WDT_DRIVER
-#if (MONOLITH_UART)
+#if (STM32_UART_DRIVER)
         case HAL_UART:
             stm32_uart_request(core, &ipc);
             break;
-#endif //MONOLITH_UART
+#endif //STM32_UART_DRIVER
 #if (STM32_ADC_DRIVER)
         case HAL_ADC:
             stm32_adc_request(core, &ipc);
@@ -87,7 +76,12 @@ void stm32_core_loop(CORE* core)
             stm32_eep_request(core, &ipc);
             break;
 #endif //STM32_EEP_DRIVER
-#if (MONOLITH_USB)
+#if (STM32_I2C_DRIVER)
+        case HAL_I2C:
+            stm32_i2c_request(core, &ipc);
+            break;
+#endif //STM32_I2C_DRIVER
+#if (STM32_USB_DRIVER)
         case HAL_USB:
 #ifdef STM32F10X_CL
             stm32_otg_request(core, &ipc);
@@ -95,7 +89,7 @@ void stm32_core_loop(CORE* core)
             stm32_usb_request(core, &ipc);
 #endif //STM32F10X_CL
             break;
-#endif //MONOLITH_USB
+#endif //STM32_USB_DRIVER
         default:
             error(ERROR_NOT_SUPPORTED);
             break;
@@ -121,9 +115,9 @@ void stm32_core()
 #if (STM32_WDT_DRIVER)
     stm32_wdt_init();
 #endif //STM32_WDT_DRIVER
-#if (MONOLITH_UART)
+#if (STM32_UART_DRIVER)
     stm32_uart_init(&core);
-#endif
+#endif //STM32_UART_DRIVER
 #if (STM32_ADC_DRIVER)
     stm32_adc_init(&core);
 #endif //STM32_ADC_DRIVER
@@ -133,13 +127,16 @@ void stm32_core()
 #if (STM32_EEP_DRIVER)
     stm32_eep_init(&core);
 #endif //STM32_EEP_DRIVER
-#if (MONOLITH_USB)
+#if (STM32_I2C_DRIVER)
+    stm32_i2c_init(&core);
+#endif //STM32_I2C_DRIVER
+#if (STM32_USB_DRIVER)
 #ifdef STM32F10X_CL
     stm32_otg_init(&core);
 #else
     stm32_usb_init(&core);
 #endif //STM32F10X_CL
-#endif //MONOLITH_USB
+#endif //STM32_USB_DRIVER
 
     stm32_core_loop(&core);
 }

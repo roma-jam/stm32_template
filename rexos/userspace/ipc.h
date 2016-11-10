@@ -24,6 +24,7 @@ typedef enum {
     IPC_CLOSE,
     IPC_GET_RX_STREAM,
     IPC_GET_TX_STREAM,
+    IPC_SYNC,
     IPC_USER = 0x100
 } IPCS;
 
@@ -60,6 +61,7 @@ typedef enum {
     HAL_HTTP,
     HAL_TLS,
     HAL_PINBOARD,
+    HAL_VFS,
     //application level
     HAL_APP
 } HAL;

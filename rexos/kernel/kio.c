@@ -9,6 +9,13 @@
 #include "kstdlib.h"
 #include "kernel_config.h"
 
+static void kio_destroy_internal(KIO* kio)
+{
+    CLEAR_MAGIC(kio);
+    kfree(kio->io);
+    kfree(kio);
+}
+
 void kio_create(IO** io, unsigned int size)
 {
     KIO* kio;
@@ -25,10 +32,13 @@ void kio_create(IO** io, unsigned int size)
         disable_interrupts();
         (*io) = kio->io = (IO*)kmalloc(size + sizeof(IO));
         enable_interrupts();
-        if (kio->io == NULL)
+        if ((kio->io) == NULL)
         {
-            kfree(kio);
+            disable_interrupts();
+            kio_destroy_internal(kio);
+            enable_interrupts();
             kprocess_error(kprocess, ERROR_OUT_OF_PAGED_MEMORY);
+            return;
         }
         kio->io->kio = (HANDLE)kio;
         kio->io->size = size + sizeof(IO);
@@ -37,17 +47,9 @@ void kio_create(IO** io, unsigned int size)
         kprocess_error(kprocess, ERROR_OUT_OF_SYSTEM_MEMORY);
 }
 
-static void kio_destroy_internal(KIO* kio)
-{
-    CLEAR_MAGIC(kio);
-    disable_interrupts();
-    kfree(kio->io);
-    kfree(kio);
-    enable_interrupts();
-}
-
 bool kio_send(KIO* kio, KPROCESS* receiver)
 {
+    IPC ipc;
     KPROCESS* kprocess = kprocess_get_current();
     if (kprocess != kio->granted)
     {
@@ -55,12 +57,15 @@ bool kio_send(KIO* kio, KPROCESS* receiver)
         return false;
     }
     //user released IO
-    if (kio->kill_flag)
+    if ((kio->kill_flag) && (receiver == kio->owner))
     {
+        disable_interrupts();
         kio_destroy_internal(kio);
-        kprocess_error(receiver, ERROR_SYNC_OBJECT_DESTROYED);
-        //always deliver IPC, even if IO is destroyed
-        return true;
+        enable_interrupts();
+        ipc.process = (HANDLE)receiver;
+        ipc.cmd = HAL_CMD(HAL_SYSTEM, IPC_SYNC);
+        kipc_post_process(&ipc, (KPROCESS*)KERNEL_HANDLE);
+        return false;
     }
     kio->granted = receiver;
     return true;
@@ -68,7 +73,7 @@ bool kio_send(KIO* kio, KPROCESS* receiver)
 
 void kio_destroy(IO *io)
 {
-    bool kill = true;
+    bool kill_flag = false;
     if (io == NULL)
         return;
     KIO* kio = (KIO*)io->kio;
@@ -82,12 +87,14 @@ void kio_destroy(IO *io)
         return;
     }
     disable_interrupts();
-    if (kio->granted != kio->owner)
+    if (kio->granted == kio->owner)
+        kio_destroy_internal(kio);
+    else
     {
         kio->kill_flag = true;
-        kill = false;
+        kill_flag = true;
     }
     enable_interrupts();
-    if (kill)
-        kio_destroy_internal(kio);
+    if (kill_flag)
+        kprocess_error(kprocess, ERROR_BUSY);
 }

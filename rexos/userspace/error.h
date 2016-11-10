@@ -37,6 +37,7 @@
 #define ERROR_INVALID_MODE                              (ERROR_GENERAL - 19)
 #define ERROR_INVALID_LENGTH                            (ERROR_GENERAL - 20)
 #define ERROR_TOO_MANY_HANDLES                          (ERROR_GENERAL - 21)
+#define ERROR_BUSY                                      (ERROR_GENERAL - 22)
 
 #define ERROR_IO                                        -100
 #define ERROR_FILE_SHARING_VIOLATION                    (ERROR_IO - 1)
@@ -45,9 +46,11 @@
 #define ERROR_IO_BUFFER_TOO_SMALL                       (ERROR_IO - 4)
 #define ERROR_IO_CANCELLED                              (ERROR_IO - 5)
 #define ERROR_FOLDER_NOT_EMPTY                          (ERROR_IO - 6)
-#define ERROR_NOT_MOUNTED                               (ERROR_IO - 7)
-#define ERROR_ALREADY_MOUNTED                           (ERROR_IO - 8)
-#define ERROR_IO_ASYNC_COMPLETE                         (ERROR_IO - 9)
+#define ERROR_IO_ASYNC_COMPLETE                         (ERROR_IO - 7)
+#define ERROR_IO_FAIL                                   (ERROR_IO - 8)
+#define ERROR_CORRUPTED                                 (ERROR_IO - 9)
+#define ERROR_EOF                                       (ERROR_IO - 10)
+#define ERROR_FULL                                      (ERROR_IO - 11)
 
 #define ERROR_MEMORY                                    -200
 #define ERROR_OUT_OF_MEMORY                             (ERROR_MEMORY - 1)

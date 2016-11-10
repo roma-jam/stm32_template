@@ -15,8 +15,11 @@
 #include "../../rexos/userspace/wdt.h"
 #include "../../rexos/userspace/uart.h"
 #include "../../rexos/userspace/process.h"
+#include "../../rexos/userspace/power.h"
 #include "../../rexos/midware/pinboard.h"
 #include "app_private.h"
+#include "comm.h"
+#include "net.h"
 #include "config.h"
 #include "../../rexos/userspace/adc.h"
 
@@ -35,6 +38,29 @@ const REX __APP = {
     //function
     app
 };
+
+
+static inline void stat()
+{
+    SYSTIME uptime;
+    int i;
+    unsigned int diff;
+
+    get_uptime(&uptime);
+    for (i = 0; i < TEST_ROUNDS; ++i)
+        svc_test();
+    diff = systime_elapsed_us(&uptime);
+    printf("average kernel call time: %d.%dus\n", diff / TEST_ROUNDS, (diff / (TEST_ROUNDS / 10)) % 10);
+
+    get_uptime(&uptime);
+    for (i = 0; i < TEST_ROUNDS; ++i)
+        process_switch_test();
+    diff = systime_elapsed_us(&uptime);
+    printf("average switch time: %d.%dus\n", diff / TEST_ROUNDS, (diff / (TEST_ROUNDS / 10)) % 10);
+
+    printf("core clock: %d\n", power_get_core_clock());
+    process_info();
+}
 
 static inline void app_setup_dbg()
 {
@@ -55,14 +81,15 @@ static inline void app_init(APP* app)
 {
     process_create(&__STM32_CORE);
 
-    gpio_enable_pin(B14, GPIO_MODE_OUT);
-    gpio_reset_pin(B14);
+    gpio_enable_pin(C8, GPIO_MODE_OUT);
+    gpio_set_pin(C8);
 
 
     app_setup_dbg();
     app->timer = timer_create(0, HAL_APP);
     timer_start_ms(app->timer, 1000);
 
+    stat();
     printf("App init\n");
 }
 
@@ -84,10 +111,6 @@ void app()
         ipc_read(&ipc);
         switch (HAL_GROUP(ipc.cmd))
         {
-        case HAL_USBD:
-        case HAL_IP:
-        case HAL_UDP:
-        case HAL_TCP:
         case HAL_APP:
             app_timeout(&app);
             break;

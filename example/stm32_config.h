@@ -7,18 +7,26 @@
 #ifndef STM32_CONFIG_H
 #define STM32_CONFIG_H
 
+//---------------------- fast drivers definitions -----------------------------------
+#define STM32_ADC_DRIVER                        0
+#define STM32_DAC_DRIVER                        0
+#define STM32_WDT_DRIVER                        0
+#define STM32_EEP_DRIVER                        0
+#define STM32_I2C_DRIVER                        0
+#define STM32_UART_DRIVER                       1
+#define STM32_RTC_DRIVER                        1
+#define STM32_USB_DRIVER                        0
 //------------------------------ CORE ------------------------------------------------
 //Sizeof CORE process stack. Adjust, if monolith UART/USB/Analog/etc is used
 #define STM32_CORE_PROCESS_SIZE                 1024
-
-//UART driver is monolith. Enable for size, disable for perfomance
-#define MONOLITH_UART                           1
-#define MONOLITH_USB                            0
 
 //disable only for power saving if no EXTI or remap is used
 #define SYSCFG_ENABLED                          1
 //stupid F1 series only. Remap mask. See datasheet
 #define STM32F1_MAPR                            (AFIO_MAPR_USART2_REMAP)
+//------------------------------- UART -----------------------------------------------
+//in any half duplex mode
+#define STM32_UART_DISABLE_ECHO                 0
 //------------------------------ POWER -----------------------------------------------
 //save few bytes here
 #define STM32_DECODE_RESET                      0
@@ -30,7 +38,7 @@
 //STM32L0
 #define MSI_RANGE                               6
 
-//STM32F1
+//STM32F1, F0
 #define PLL_MUL                                 6
 #define PLL_DIV                                 2
 //STM32L0
@@ -47,14 +55,6 @@
 #define PLL_P                                   0
 
 #define STANDBY_WKUP                            0
-//------------------------------ UART ------------------------------------------------
-//size of every uart internal tx buf. Increasing this you will get less irq ans ipc calls, but faster processing
-//remember, that process itself requires around 256 bytes
-#define UART_TX_BUF_SIZE                        16
-//generally UART is used as stdout/stdio, so fine-tuning is required only on hi load
-#define UART_STREAM_SIZE                        32
-//Sizeof UART process. Remember, that process itself requires around 450 bytes. Only for stand-alone UART driver
-#define STM32_UART_PROCESS_SIZE                 410 + (50 + UART_TX_BUF_SIZE) * 1
 //------------------------------ TIMER -----------------------------------------------
 #define HPET_TIMER                              TIM_2
 //only required if no STM32_RTC_DRIVER is set
@@ -62,7 +62,6 @@
 //disable to save few bytes
 #define TIMER_IO                                1
 //------------------------------- ADC ------------------------------------------------
-#define STM32_ADC_DRIVER                        0
 //In L0 series - select HSI16 as clock source
 #define STM32_ADC_ASYNCRONOUS_CLOCK             0
 // Avg Slope, refer to datasheet
@@ -71,7 +70,6 @@
 #define V25_MV                                  1400
 
 //------------------------------- DAC ------------------------------------------------
-#define STM32_DAC_DRIVER                        0
 #define DAC_BOFF                                0
 
 //DAC streaming support with DMA. Can be disabled for flash saving
@@ -91,15 +89,9 @@
 //Full speed: 64 if no isochronous transfers, else  1024
 //High speed(STM32F2+): 64 if no high-speed bulk transfers, 512 in other case. 1024 in case of isochronous or high-speed interrupts
 #define STM32_USB_MPS                           64
-//Sizeof USB process stack. Remember, that process itself requires around 512 bytes
-#define STM32_USB_PROCESS_SIZE                  600
 //------------------------------- WDT ------------------------------------------------
 //if set by STM32 Option Bits, WDT is started by hardware on power-up
 #define HARDWARE_WATCHDOG                       0
-//WDT module enable
-#define STM32_WDT_DRIVER                        0
-//------------------------------- RTC ------------------------------------------------
-#define STM32_RTC_DRIVER                        1
 //------------------------------- ETH -----------------------------------------------
 #define STM32_ETH_PROCESS_SIZE                  512
 

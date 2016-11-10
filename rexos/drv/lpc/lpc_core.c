@@ -21,6 +21,7 @@
 #endif //LPC11Uxx
 #include "lpc_eep.h"
 #include "lpc_sdmmc.h"
+#include "lpc_flash.h"
 
 void lpc_core();
 
@@ -54,15 +55,17 @@ void lpc_core_loop(CORE* core)
         case HAL_TIMER:
             lpc_timer_request(core, &ipc);
             break;
+#if (LPC_UART_DRIVER)
         case HAL_UART:
             lpc_uart_request(core, &ipc);
             break;
+#endif //LPC_UART_DRIVER
 #if (LPC_I2C_DRIVER)
         case HAL_I2C:
             lpc_i2c_request(core, &ipc);
             break;
 #endif //LPC_I2C_DRIVER
-#if (MONOLITH_USB)
+#if (LPC_USB_DRIVER)
         case HAL_USB:
 #ifdef LPC11Uxx
             lpc_usb_request(core, &ipc);
@@ -70,7 +73,7 @@ void lpc_core_loop(CORE* core)
             lpc_otg_request(core, &ipc);
 #endif //LPC11Uxx
             break;
-#endif //MONOLITH_USB
+#endif //LPC_USB_DRIVER
 #if (LPC_EEPROM_DRIVER)
         case HAL_EEPROM:
             lpc_eep_request(core, &ipc);
@@ -81,6 +84,11 @@ void lpc_core_loop(CORE* core)
             lpc_sdmmc_request(core, &ipc);
             break;
 #endif //LPC_SDMMC_DRIVER
+#if (LPC_FLASH_DRIVER)
+        case HAL_FLASH:
+            lpc_flash_request(core, &ipc);
+            break;
+#endif //LPC_FLASH_DRIVER
         default:
             error(ERROR_NOT_SUPPORTED);
             break;
@@ -123,25 +131,30 @@ void lpc_core()
     lpc_power_init(&core);
     lpc_pin_init(&core);
     lpc_timer_init(&core);
+#if (LPC_UART_DRIVER)
     lpc_uart_init(&core);
+#endif //LPC_UART_DRIVER
 #if (LPC_I2C_DRIVER)
     lpc_i2c_init(&core);
 #endif //LPC_I2C_DRIVER
 #if (LPC_SDMMC_DRIVER)
     lpc_sdmmc_init(&core);
 #endif //LPC_SDMMC_DRIVER
-#if (MONOLITH_USB)
+#if (LPC_USB_DRIVER)
 #ifdef LPC11Uxx
     lpc_usb_init(&core);
 #else //LPC18xx
     lpc_otg_init(&core);
 #endif //LPC11Uxx
-#endif //MONOLITH_USB
+#endif //LPC_USB_DRIVER
 #if (LPC_EEPROM_DRIVER)
 #ifdef LPC18xx
     lpc_eep_init(&core);
 #endif //LPC18xx
 #endif //LPC_EEPROM_DRIVER
+#if (LPC_FLASH_DRIVER)
+    lpc_flash_init(&core);
+#endif //LPC_FLASH_DRIVER
 
     lpc_core_loop(&core);
 }
