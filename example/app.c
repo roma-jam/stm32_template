@@ -4,24 +4,24 @@
     All rights reserved.
 */
 
-#include "../../rexos/userspace/stdio.h"
-#include "../../rexos/userspace/stdlib.h"
-#include "../../rexos/userspace/process.h"
-#include "../../rexos/userspace/sys.h"
-#include "../../rexos/userspace/gpio.h"
-#include "../../rexos/userspace/stm32/stm32_driver.h"
-#include "../../rexos/userspace/ipc.h"
-#include "../../rexos/userspace/systime.h"
-#include "../../rexos/userspace/wdt.h"
-#include "../../rexos/userspace/uart.h"
-#include "../../rexos/userspace/process.h"
-#include "../../rexos/userspace/power.h"
-#include "../../rexos/midware/pinboard.h"
+#include "../rexos/userspace/stdio.h"
+#include "../rexos/userspace/stdlib.h"
+#include "../rexos/userspace/process.h"
+#include "../rexos/userspace/sys.h"
+#include "../rexos/userspace/gpio.h"
+#include "../rexos/userspace/stm32/stm32_driver.h"
+#include "../rexos/userspace/ipc.h"
+#include "../rexos/userspace/systime.h"
+#include "../rexos/userspace/wdt.h"
+#include "../rexos/userspace/uart.h"
+#include "../rexos/userspace/process.h"
+#include "../rexos/userspace/power.h"
+#include "../rexos/midware/pinboard.h"
+#include "../rexos/userspace/adc.h"
 #include "app_private.h"
 #include "comm.h"
 #include "net.h"
 #include "config.h"
-#include "../../rexos/userspace/adc.h"
 
 
 void app();
@@ -30,7 +30,7 @@ const REX __APP = {
     //name
     "App main",
     //size
-    1024,
+    512,
     //priority
     200,
     //flags
