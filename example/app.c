@@ -105,12 +105,16 @@ void app()
     IPC ipc;
 
     app_init(&app);
+    comm_init(&app);
 
     for (;;)
     {
         ipc_read(&ipc);
         switch (HAL_GROUP(ipc.cmd))
         {
+        case HAL_USBD:
+            comm_request(&app, &ipc);
+            break;
         case HAL_APP:
             app_timeout(&app);
             break;

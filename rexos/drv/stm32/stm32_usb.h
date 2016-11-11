@@ -11,8 +11,8 @@
 #include "../../userspace/ipc.h"
 #include "../../userspace/io.h"
 #include "stm32_config.h"
-#include "sys_config.h"
 #include "stm32_core.h"
+#include "sys_config.h"
 
 typedef struct {
     IO* io;

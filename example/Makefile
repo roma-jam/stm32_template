@@ -53,15 +53,15 @@ SRC_C                      += kernel.c dbg.c kstdlib.c karray.c kso.c kirq.c kpr
 #lib
 SRC_C                      += lib_lib.c lib_systime.c pool.c printf.c lib_std.c lib_stdio.c lib_array.c lib_so.c
 #drv
-SRC_C                      += stm32_pin.c stm32_gpio.c stm32_power.c stm32_timer.c stm32_rtc.c stm32_core.c stm32_uart.c
+SRC_C                      += stm32_pin.c stm32_gpio.c stm32_power.c stm32_timer.c stm32_core.c stm32_uart.c stm32_usb.c
 #userspace lib
 SRC_C                      += ipc.c io.c process.c stdio.c stdlib.c systime.c time.c uart.c usb.c power.c
 #SRC_C                      += eth.c tcpip.c mac.c icmp.c ip.c arp.c tcp.c
 #midware
-#SRC_C                      += usbd.c cdc_acmd.c eth_phy.c tcpips.c macs.c routes.c arps.c ips.c icmps.c tcps.c
+SRC_C                      += usbd.c cdc_acmd.c 
+#SRC_C 						+= eth_phy.c tcpips.c macs.c routes.c arps.c ips.c icmps.c tcps.c
 #userspace lib
-SRC_C                      += app.c 
-#SRC_C 						+= comm.c net.c
+SRC_C                      += app.c comm.c 
 
 OBJ                         = $(SRC_AS:%.S=%.o) $(SRC_C:%.c=%.o)
 #----------------------------------------------------------
