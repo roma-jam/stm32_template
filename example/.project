@@ -27,7 +27,7 @@
 		<link>
 			<name>rexos</name>
 			<type>2</type>
-			<location>D:/Projects/template/rexos</location>
+			<location>D:/Projects/stm32_template/rexos</location>
 		</link>
 	</linkedResources>
 </projectDescription>

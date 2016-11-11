@@ -40,7 +40,7 @@
 
 //STM32F1, F0
 #define PLL_MUL                                 6
-#define PLL_DIV                                 2
+#define PLL_DIV                                 1
 //STM32L0
 //#define PLL_MUL                                 12
 //#define PLL_DIV                                 3

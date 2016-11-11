@@ -411,9 +411,11 @@ static inline void usbd_open(USBD* usbd, USB_PORT_TYPE port)
         error(ERROR_ALREADY_CONFIGURED);
         return;
     }
+
     usbd->io = io_create(USBD_IO_SIZE);
     if (usbd->io == NULL)
         return;
+
     usbd->setup_state = USB_SETUP_STATE_REQUEST;
     usbd->state = USBD_STATE_DEFAULT;
     usbd->self_powered = usbd->remote_wakeup = false;
@@ -482,9 +484,11 @@ static inline void usbd_reset(USBD* usbd, USB_SPEED speed)
     //don't reset on configured state to be functional in virtualbox environment
     if (usbd->state != USBD_STATE_CONFIGURED)
         usbd->state = USBD_STATE_DEFAULT;
+
 #if (USBD_DEBUG_REQUESTS)
     printf("USB device reset\n");
 #endif
+
     if (usbd->ep0_size)
     {
         usbd_usb_ep_close(usbd, 0);
@@ -974,6 +978,13 @@ static void usbd_setup_process(USBD* usbd)
 
 static inline void usbd_setup_received(USBD* usbd)
 {
+#if (USBD_DEBUG_FLOW)
+    printf("SETUP: ");
+    for(uint8_t i = 0; i < 8; i ++)
+        printf("%02X ", ((uint8_t*)(&usbd->setup))[i]);
+    printf("\n");
+#endif //USBD_DEBUG_FLOW
+
     //Back2Back setup received
     if (usbd->setup_state != USB_SETUP_STATE_REQUEST)
     {

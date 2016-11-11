@@ -41,11 +41,11 @@
 
 //----------------------------- USB device--------------------------------------------
 //all other device-related debug depends on this
-#define USBD_DEBUG                                          0
+#define USBD_DEBUG                                          1
 #define USBD_DEBUG_ERRORS                                   0
 #define USBD_DEBUG_REQUESTS                                 0
 //enable only for USB driver development
-#define USBD_DEBUG_FLOW                                     0
+#define USBD_DEBUG_FLOW                                     1
 
 //vendor-specific requests support
 #define USBD_VSR                                            0

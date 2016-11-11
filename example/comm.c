@@ -5,12 +5,14 @@
 */
 
 #include "comm.h"
-#include "../../rexos/userspace/stdio.h"
-#include "../../rexos/userspace/stdlib.h"
-#include "../../rexos/userspace/usb.h"
-#include "../../rexos/userspace/stream.h"
-#include "../../rexos/midware/usbd/usbd.h"
-#include "../../rexos/drv/stm32/stm32_usb.h"
+#include "../rexos/userspace/stdio.h"
+#include "../rexos/userspace/stdlib.h"
+#include "../rexos/userspace/usb.h"
+#include "../rexos/userspace/stream.h"
+#include "../rexos/userspace/gpio.h"
+#include "../rexos/userspace/stm32/stm32_driver.h"
+#include "../rexos/midware/usbd/usbd.h"
+#include "../rexos/drv/stm32/stm32_usb.h"
 #include "usb_desc.h"
 #include "sys_config.h"
 #include "stm32_config.h"
@@ -84,9 +86,9 @@ static inline void comm_usbd_stream_rx(APP* app, unsigned int size)
 void comm_init(APP *app)
 {
     app->comm.rx = app->comm.tx = app->comm.rx_stream = INVALID_HANDLE;
-
     //setup >usbd
     app->usbd = usbd_create(USB_PORT_NUM, USBD_PROCESS_SIZE, USBD_PROCESS_PRIORITY);
+
     ack(app->usbd, HAL_REQ(HAL_USBD, USBD_REGISTER_HANDLER), 0, 0, 0);
 
     usbd_register_const_descriptor(app->usbd, &__DEVICE_DESCRIPTOR, 0, 0);
@@ -98,7 +100,6 @@ void comm_init(APP *app)
     usbd_register_const_descriptor(app->usbd, &__STRING_DEFAULT, 4, 0x0409);
 
     ack(app->usbd, HAL_REQ(HAL_USBD, IPC_OPEN), USB_PORT_NUM, 0, 0);
-
     printf("Comm init\n");
 }
 

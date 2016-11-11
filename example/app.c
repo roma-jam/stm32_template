@@ -87,9 +87,9 @@ static inline void app_init(APP* app)
 
     app_setup_dbg();
     app->timer = timer_create(0, HAL_APP);
-    timer_start_ms(app->timer, 1000);
+//    timer_start_ms(app->timer, 1000);
 
-    stat();
+//    stat();
     printf("App init\n");
 }
 
