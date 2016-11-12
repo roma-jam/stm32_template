@@ -81,15 +81,22 @@ static inline void app_init(APP* app)
 {
     process_create(&__STM32_CORE);
 
+    // Disable JTAG
+    bool was_enabled = (RCC->APB2ENR & RCC_APB2ENR_AFIOEN);
+    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+    uint32_t tmp = AFIO->MAPR;
+    tmp &= ~AFIO_MAPR_SWJ_CFG;
+    tmp |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+    AFIO->MAPR = tmp;
+    if (!was_enabled) RCC->APB2ENR &= ~RCC_APB2ENR_AFIOEN;
+
     gpio_enable_pin(B0, GPIO_MODE_OUT);
     gpio_set_pin(B0);
-
 
     app_setup_dbg();
     app->timer = timer_create(0, HAL_APP);
 //    timer_start_ms(app->timer, 1000);
 
-//    stat();
     printf("App init\n");
 }
 
@@ -106,6 +113,7 @@ void app()
 
     app_init(&app);
     comm_init(&app);
+    comm_connect(&app);
 
     for (;;)
     {

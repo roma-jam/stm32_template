@@ -36,14 +36,14 @@
 //-------------------------------- USB -----------------------------------------------
 #define USB_EP_COUNT_MAX                                    4
 //low-level USB debug. Turn on only in case of IO problems
-#define USB_DEBUG_ERRORS                                    1
+#define USB_DEBUG_ERRORS                                    0
 #define USB_TEST_MODE_SUPPORT                               0
 
 //----------------------------- USB device--------------------------------------------
 //all other device-related debug depends on this
 #define USBD_DEBUG                                          1
 #define USBD_DEBUG_ERRORS                                   0
-#define USBD_DEBUG_REQUESTS                                 0
+#define USBD_DEBUG_REQUESTS                                 1
 //enable only for USB driver development
 #define USBD_DEBUG_FLOW                                     1
 

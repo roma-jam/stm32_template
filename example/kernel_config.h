@@ -28,7 +28,7 @@
 //Enabling this you will get stats on each thread uptime, but decreasing context switching up to 2 times
 #define KERNEL_PROCESS_STAT                         1
 //size of IPC queue per process
-#define KERNEL_IPC_COUNT                            5
+#define KERNEL_IPC_COUNT                            7
 //Enable this only if you have problems with IPC oferflow.
 #define KERNEL_IPC_DEBUG                            1
 //maximum number of global handles. Must be at least 1

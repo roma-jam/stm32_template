@@ -83,10 +83,24 @@ static inline void comm_usbd_stream_rx(APP* app, unsigned int size)
     stream_listen(app->comm.rx_stream, 0, HAL_USBD);
 }
 
+void comm_connect(APP* app)
+{
+    gpio_set_pin(A15);
+}
+
+void comm_disconnect(APP* app)
+{
+    gpio_reset_pin(A15);
+}
+
+
 void comm_init(APP *app)
 {
+    gpio_enable_pin(A15, GPIO_MODE_OUT);
     app->comm.rx = app->comm.tx = app->comm.rx_stream = INVALID_HANDLE;
     //setup >usbd
+    comm_disconnect(app);
+
     app->usbd = usbd_create(USB_PORT_NUM, USBD_PROCESS_SIZE, USBD_PROCESS_PRIORITY);
 
     ack(app->usbd, HAL_REQ(HAL_USBD, USBD_REGISTER_HANDLER), 0, 0, 0);

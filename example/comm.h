@@ -19,6 +19,8 @@ typedef struct {
     bool active;
 }COMM;
 
+void comm_connect(APP* app);
+void comm_disconnect(APP* app);
 void comm_init(APP* app);
 void comm_request(APP* app, IPC* ipc);
 

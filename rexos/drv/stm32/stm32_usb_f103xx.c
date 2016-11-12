@@ -34,9 +34,9 @@ typedef struct {
     uint16_t ADDR_RX;
     uint16_t COUNT_RX;
 } USB_BUFFER_DESCRIPTOR;
-#pragma pack(pop)
 
 #define USB_BUFFER_DESCRIPTORS                      ((USB_BUFFER_DESCRIPTOR*) USB_PMAADDR)
+#pragma pack(pop)
 
 #define GET_CORE_CLOCK                              stm32_power_get_clock_inside(core, POWER_CORE_CLOCK)
 #define ack_pin                                     stm32_pin_request_inside
@@ -225,11 +225,12 @@ static inline void stm32_usb_ctr(CORE* core)
     num = USB->ISTR & USB_ISTR_EP_ID;
 
     //got SETUP
-    if (num == 0 && (*ep_reg_data(num)) & USB_EP_SETUP)
+    if ((num == 0) && ((*ep_reg_data(num)) & USB_EP_SETUP))
     {
         ipc.cmd = HAL_CMD(HAL_USB, USB_SETUP);
         ipc.process = core->usb.device;
         ipc.param1 = 0;
+        iprintd("%d\n", *((int*)(USB_BUFFER_DESCRIPTORS[0].COUNT_RX + USB_PMAADDR)));
         memcpy16(&ipc.param2, (void*)(USB_BUFFER_DESCRIPTORS[0].ADDR_RX + USB_PMAADDR), 4);
         memcpy16(&ipc.param3, (void*)(USB_BUFFER_DESCRIPTORS[0].ADDR_RX + USB_PMAADDR + 4), 4);
         ipc_ipost(&ipc);
@@ -250,21 +251,18 @@ void stm32_usb_on_isr(int vector, void* param)
 
     if (sta & USB_ISTR_RESET)
     {
-        iprintd("res\n");
         stm32_usb_reset(core);
         USB->ISTR &= ~USB_ISTR_RESET;
         return;
     }
     if ((sta & USB_ISTR_SUSP) && (USB->CNTR & USB_CNTR_SUSPM))
     {
-        iprintd("sup\n");
         stm32_usb_suspend(core);
         USB->ISTR &= ~USB_ISTR_SUSP;
         return;
     }
     if (sta & USB_ISTR_WKUP)
     {
-        iprintd("wup\n");
         stm32_usb_wakeup(core);
         USB->ISTR &= ~USB_ISTR_WKUP;
         return;
@@ -272,7 +270,6 @@ void stm32_usb_on_isr(int vector, void* param)
     //transfer complete. Check after status
     if (sta & USB_ISTR_CTR)
     {
-        iprintd("ctrl\n");
         stm32_usb_ctr(core);
         return;
     }
@@ -301,10 +298,6 @@ void stm32_usb_open_device(CORE* core, HANDLE device)
 {
     int i;
     core->usb.device = device;
-
-    //enable GPIO
-    ack_pin(core, HAL_REQ(HAL_PIN, STM32_GPIO_ENABLE_PIN), A15, GPIO_MODE_OUT, false);
-    gpio_reset_pin(A15);
 
     //enable clock, setup prescaller
     switch (GET_CORE_CLOCK)
@@ -349,8 +342,6 @@ void stm32_usb_open_device(CORE* core, HANDLE device)
 #if (USB_DEBUG_ERRORS)
     USB->CNTR |= USB_CNTR_PMAOVRM | USB_CNTR_ERRM;
 #endif
-
-    gpio_set_pin(A15);
 }
 
 static inline void stm32_usb_open_ep(CORE* core, unsigned int num, USB_EP_TYPE type, unsigned int size)
@@ -360,7 +351,6 @@ static inline void stm32_usb_open_ep(CORE* core, unsigned int num, USB_EP_TYPE t
         error(ERROR_ALREADY_CONFIGURED);
         return;
     }
-
 
     //find free addr in FIFO
     unsigned int fifo, i;
@@ -372,8 +362,6 @@ static inline void stm32_usb_open_ep(CORE* core, unsigned int num, USB_EP_TYPE t
         if (core->usb.out[i])
             fifo += core->usb.out[i]->mps;
     }
-    printd("EP open %d, size %d, fifo %#X\n", num, size, fifo);
-
     fifo += sizeof(USB_BUFFER_DESCRIPTOR) * USB_EP_COUNT_MAX;
 
     EP* ep = malloc(sizeof(EP));
@@ -482,19 +470,19 @@ static inline void stm32_usb_set_address(CORE* core, int addr)
 
 static bool stm32_usb_io_prepare(CORE* core, IPC* ipc)
 {
-EP* ep = ep_data(core, ipc->param1);
-if (ep == NULL)
-{
-    error(ERROR_NOT_CONFIGURED);
-    return false;
-}
-if (ep->io_active)
-{
-    error(ERROR_IN_PROGRESS);
-    return false;
-}
-ep->io = (IO*)ipc->param2;
-return true;
+    EP* ep = ep_data(core, ipc->param1);
+    if (ep == NULL)
+    {
+        error(ERROR_NOT_CONFIGURED);
+        return false;
+    }
+    if (ep->io_active)
+    {
+        error(ERROR_IN_PROGRESS);
+        return false;
+    }
+    ep->io = (IO*)ipc->param2;
+    return true;
 }
 
 static inline void stm32_usb_read(CORE* core, IPC* ipc)
