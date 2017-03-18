@@ -29,10 +29,12 @@ typedef enum {
 
 #pragma pack(push, 1)
 typedef struct {
-    uint16_t ADDR_TX;
+    uint32_t ADDR_TX;
     uint16_t COUNT_TX;
-    uint16_t ADDR_RX;
+    uint16_t COUNT_TX_1;
+    uint32_t ADDR_RX;
     uint16_t COUNT_RX;
+    uint16_t COUNT_RX_1;
 } USB_BUFFER_DESCRIPTOR;
 
 #define USB_BUFFER_DESCRIPTORS                      ((USB_BUFFER_DESCRIPTOR*) USB_PMAADDR)
@@ -41,12 +43,26 @@ typedef struct {
 #define GET_CORE_CLOCK                              stm32_power_get_clock_inside(core, POWER_CORE_CLOCK)
 #define ack_pin                                     stm32_pin_request_inside
 
-static inline void memcpy16(void* dst, void* src, unsigned int size)
+//static inline void memcpy16(void* dst, void* src, unsigned int size)
+//{
+//    int i;
+//    size = (size + 1) / 2;
+//    for (i = 0; i < size; ++i)
+//        ((uint16_t*)dst)[i] = ((uint16_t*)src)[i];
+//}
+
+static inline void btbl2buf(void* dst, unsigned int* addr, unsigned int size)
 {
-    int i;
     size = (size + 1) / 2;
-    for (i = 0; i < size; ++i)
-        ((uint16_t*)dst)[i] = ((uint16_t*)src)[i];
+    for(uint8_t i=0; i < size; i++)
+        ((uint16_t*)dst)[i] = (uint16_t)*addr++;
+}
+
+static inline void buf2btbl(unsigned int* addr, void* src, unsigned int size)
+{
+    size = (size + 1) / 2;
+    for(uint8_t i=0; i < size; i++)
+        *addr++ = (unsigned int)((uint16_t*)src)[i];
 }
 
 static inline uint16_t* ep_reg_data(unsigned int num)
@@ -75,7 +91,7 @@ static void stm32_usb_tx(CORE* core, unsigned int ep_num)
     if (size > ep->mps)
         size = ep->mps;
     USB_BUFFER_DESCRIPTORS[ep_num].COUNT_TX = size;
-    memcpy16((void*)(USB_BUFFER_DESCRIPTORS[ep_num].ADDR_TX + USB_PMAADDR), io_data(ep->io) + ep->size, size);
+    buf2btbl((void*)(USB_BUFFER_DESCRIPTORS[ep_num].ADDR_TX * 2 + USB_PMAADDR), io_data(ep->io) + ep->size, size);
 }
 
 bool stm32_usb_ep_flush(CORE* core, unsigned int num)
@@ -203,7 +219,7 @@ static inline void stm32_usb_rx_isr(CORE* core, unsigned int ep_num)
 {
     EP* ep = core->usb.out[ep_num];
     uint16_t size = USB_BUFFER_DESCRIPTORS[ep_num].COUNT_RX & 0x3ff;
-    memcpy16(io_data(ep->io) + ep->io->data_size, (void*)(USB_BUFFER_DESCRIPTORS[ep_num].ADDR_RX + USB_PMAADDR), size);
+    btbl2buf(io_data(ep->io) + ep->io->data_size, (void*)(USB_BUFFER_DESCRIPTORS[ep_num].ADDR_RX * 2 + USB_PMAADDR), size);
     *ep_reg_data(ep_num) = (*ep_reg_data(ep_num)) & USB_EPREG_MASK & ~USB_EP_CTR_RX;
     ep->io->data_size += size;
 
@@ -230,9 +246,10 @@ static inline void stm32_usb_ctr(CORE* core)
         ipc.cmd = HAL_CMD(HAL_USB, USB_SETUP);
         ipc.process = core->usb.device;
         ipc.param1 = 0;
-        iprintd("%d\n", *((int*)(USB_BUFFER_DESCRIPTORS[0].COUNT_RX + USB_PMAADDR)));
-        memcpy16(&ipc.param2, (void*)(USB_BUFFER_DESCRIPTORS[0].ADDR_RX + USB_PMAADDR), 4);
-        memcpy16(&ipc.param3, (void*)(USB_BUFFER_DESCRIPTORS[0].ADDR_RX + USB_PMAADDR + 4), 4);
+
+        btbl2buf(&ipc.param2, (void*)(USB_BUFFER_DESCRIPTORS[0].ADDR_RX * 2 + USB_PMAADDR), 4);
+        btbl2buf(&ipc.param3, (void*)(USB_BUFFER_DESCRIPTORS[0].ADDR_RX * 2 + USB_PMAADDR + 8), 4);
+
         ipc_ipost(&ipc);
         *ep_reg_data(num) = (*ep_reg_data(num)) & USB_EPREG_MASK & ~USB_EP_CTR_RX;
     }

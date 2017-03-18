@@ -588,7 +588,7 @@ static inline void stm32_usb_ep_request(CORE* core, IPC* ipc)
         stm32_usb_ep_clear_stall(core, ipc->param1);
         break;
     case USB_EP_IS_STALL:
-        ipc->param2 = stm32_usb_ep_is_stall(ipc->param1);
+        ipc->param2 = stm32_usb_ep_is_stall(core, ipc->param1);
         break;
     case IPC_READ:
         stm32_usb_read(core, ipc);

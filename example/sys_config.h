@@ -45,7 +45,7 @@
 #define USBD_DEBUG_ERRORS                                   0
 #define USBD_DEBUG_REQUESTS                                 1
 //enable only for USB driver development
-#define USBD_DEBUG_FLOW                                     1
+#define USBD_DEBUG_FLOW                                     0
 
 //vendor-specific requests support
 #define USBD_VSR                                            0
