@@ -9,6 +9,8 @@
 # 15 "../rexos/kernel/../userspace/core/core.h" 2
 # 1 "../rexos/kernel/../userspace/core/../lpc/lpc.h" 1
 # 16 "../rexos/kernel/../userspace/core/core.h" 2
+# 1 "../rexos/kernel/../userspace/core/../ti/ti.h" 1
+# 17 "../rexos/kernel/../userspace/core/core.h" 2
 # 13 "../rexos/kernel/arm.ld.S" 2
 
 MEMORY
@@ -21,8 +23,10 @@ SECTIONS
 {
  .text :
  {
-  KEEP(*(.reset));
-  *(.text .text.* .gnu.linkonce.t.*)
+                KEEP(*(.isr_vectors));
+                KEEP(*(.flashconfig));
+                KEEP(*(.reset));
+                *(.text .text.* .gnu.linkonce.t.*)
   *(.glue_7t) *(.glue_7)
   *(.rodata .rodata.* .gnu.linkonce.r.*)
   . = ALIGN(4);

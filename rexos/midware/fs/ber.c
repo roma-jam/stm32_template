@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -196,9 +196,9 @@ void ber_init(VFSS_TYPE *vfss)
 static void ber_close_internal(VFSS_TYPE* vfss)
 {
     free(vfss->ber.remap_list);
+    free(vfss->ber.stat_list);
     vfss->ber.remap_list = NULL;
     vfss->ber.stat_list = NULL;
-    free(vfss->ber.stat_list);
     io_destroy(vfss->ber.io);
     vfss->ber.io = NULL;
 }
@@ -314,13 +314,14 @@ static inline void ber_format(VFSS_TYPE* vfss, IO* io)
         hdr = vfss_get_buf(vfss);
         if ((hdr->magic == BER_MAGIC))
             if (!storage_erase_sync(vfss->volume.hal, vfss->volume.process, vfss->volume.user, vfss->io,
-                                    vfss->volume.first_sector + i * format->block_sectors, FAT_SECTOR_SIZE))
+                                    vfss->volume.first_sector + i * format->block_sectors, 1))
                 return;
     }
 
     //make superblock
     //header
     vfss_resize_buf(vfss, vfss->ber.block_size);
+    memset(vfss_get_buf(vfss), 0xff, vfss->ber.block_size);
     hdr = vfss_get_buf(vfss);
     hdr->magic = BER_MAGIC;
     hdr->revision = 1;

@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -364,12 +364,6 @@
 #define LPC
 #endif
 
-#if defined(CORTEX_M3) || defined(CORTEX_M0)
-#ifndef CORTEX_M
-#define CORTEX_M
-#endif //CORTEX_M
-#endif //defined(CORTEX_M3) || defined(CORTEX_M0)
-
 #if defined(LPC)
 //shadow area for 18xx
 #ifndef FLASH_BASE
@@ -386,9 +380,11 @@
 
 #if defined(LPC)
 
+#include "lpc_config.h"
+#include "lpc_driver.h"
+
 #if defined(LPC11Uxx)
 #include "lpc11uxx_bits.h"
-#include "lpc_config.h"
 #if defined(LPC11U6x)
 #include "LPC11U6x.h"
 #else

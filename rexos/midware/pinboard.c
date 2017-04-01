@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -177,7 +177,6 @@ void pinboard()
     PINBOARD pinboard;
     pinboard_init(&pinboard);
 
-    object_set_self(SYS_OBJ_PINBOARD);
     for (;;)
     {
         ipc_read(&ipc);

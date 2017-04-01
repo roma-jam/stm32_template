@@ -1,13 +1,12 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
 #ifndef STM32_DRIVER_H
 #define STM32_DRIVER_H
 
-#include "stm32_config.h"
 #include "../adc.h"
 #include "../power.h"
 #include "sys_config.h"
@@ -67,9 +66,7 @@ typedef enum {
 //------------------------------------------------- GPIO ---------------------------------------------------------------------
 
 typedef enum {
-    STM32_GPIO_ENABLE_PIN = IPC_USER,
-    STM32_GPIO_DISABLE_PIN,
-    STM32_GPIO_ENABLE_EXTI,
+    STM32_GPIO_ENABLE_EXTI = IPC_USER,
     STM32_GPIO_DISABLE_EXTI
 } STM32_GPIO_IPCS;
 

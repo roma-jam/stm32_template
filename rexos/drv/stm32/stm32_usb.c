@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -11,6 +11,7 @@
 #include "../../userspace/stm32/stm32_driver.h"
 #include "stm32_power.h"
 #include <string.h>
+#include <stdint.h>
 #include "../../userspace/stdlib.h"
 #include "../../userspace/stdio.h"
 #include "stm32_core_private.h"
@@ -25,18 +26,23 @@ typedef enum {
     STM32_USB_OVERFLOW
 }STM32_USB_IPCS;
 
-#pragma pack(push, 1)
+#if defined(STM32F1)
+    #define USB_IRQn                    USB_LP_CAN1_RX0_IRQn
+    typedef uint32_t pma_reg;
+#else
+    typedef uint16_t pma_reg;
+#endif //STM32F1
 
+#pragma pack(push, 1)
 typedef struct {
-    uint16_t ADDR_TX;
-    uint16_t COUNT_TX;
-    uint16_t ADDR_RX;
-    uint16_t COUNT_RX;
+    pma_reg ADDR_TX;
+    pma_reg COUNT_TX;
+    pma_reg ADDR_RX;
+    pma_reg COUNT_RX;
 } USB_BUFFER_DESCRIPTOR;
+#pragma pack(pop)
 
 #define USB_BUFFER_DESCRIPTORS                      ((USB_BUFFER_DESCRIPTOR*) USB_PMAADDR)
-
-#pragma pack(pop)
 
 static inline uint16_t* ep_reg_data(unsigned int num)
 {
@@ -59,8 +65,20 @@ static inline void memcpy16(void* dst, void* src, unsigned int size)
 {
     int i;
     size = (size + 1) / 2;
+#if defined(STM32F1)
+    if(((uint32_t)dst & 0xFFFFF000)==USB_PMAADDR) dst=(void*)((uint32_t)dst + ((uint32_t)dst & 0x00000FFF));
+    if(((uint32_t)src & 0xFFFFF000)==USB_PMAADDR) src=(void*)((uint32_t)src + ((uint32_t)src & 0x00000FFF));
+#endif
     for (i = 0; i < size; ++i)
+    {
         ((uint16_t*)dst)[i] = ((uint16_t*)src)[i];
+#if defined(STM32F1)
+        if(((uint32_t)dst & 0xFFFFF000)==USB_PMAADDR)
+            dst=(void*)((uint32_t)dst + 2);
+        else
+            src=(void*)((uint32_t)src + 2);
+#endif
+    }
 }
 
 static void stm32_usb_tx(CORE* core, unsigned int ep_num)
@@ -116,7 +134,7 @@ void stm32_usb_ep_clear_stall(CORE* core, unsigned int num)
 }
 
 
-bool stm32_usb_ep_is_stall(CORE* core, unsigned int num)
+bool stm32_usb_ep_is_stall(unsigned int num)
 {
     if (USB_EP_IN & num)
         return ((*ep_reg_data(num)) & USB_EPTX_STAT) == USB_EP_TX_STALL;
@@ -295,6 +313,22 @@ void stm32_usb_open_device(CORE* core, HANDLE device)
     int i;
     core->usb.device = device;
 
+#if defined(STM32F1)
+    //enable clock, setup prescaller
+    switch (stm32_power_get_clock_inside(core, POWER_CORE_CLOCK))
+    {
+    case 72000000:
+        RCC->CFGR &= ~(1 << 22);
+        break;
+    case 48000000:
+        RCC->CFGR |= 1 << 22;
+        break;
+    default:
+        error(ERROR_NOT_SUPPORTED);
+        return;
+    }
+#endif
+
     //enable clock
     RCC->APB1ENR |= RCC_APB1ENR_USBEN;
 
@@ -342,8 +376,10 @@ void stm32_usb_open_device(CORE* core, HANDLE device)
     USB->CNTR |= USB_CNTR_PMAOVRM | USB_CNTR_ERRM;
 #endif
 
+#ifndef STM32F1
     //pullup device
     USB->BCDR |= USB_BCDR_DPPU;
+#endif //STM32F1
 }
 
 static inline void stm32_usb_open_ep(CORE* core, unsigned int num, USB_EP_TYPE type, unsigned int size)
@@ -364,7 +400,11 @@ static inline void stm32_usb_open_ep(CORE* core, unsigned int num, USB_EP_TYPE t
         if (core->usb.out[i])
             fifo += core->usb.out[i]->mps;
     }
+#if defined(STM32F1)
+    fifo += sizeof(USB_BUFFER_DESCRIPTOR) * USB_EP_COUNT_MAX / 2;
+#else
     fifo += sizeof(USB_BUFFER_DESCRIPTOR) * USB_EP_COUNT_MAX;
+#endif
 
     EP* ep = malloc(sizeof(EP));
     if (ep == NULL)
@@ -404,7 +444,7 @@ static inline void stm32_usb_open_ep(CORE* core, unsigned int num, USB_EP_TYPE t
         if (size <= 62)
             USB_BUFFER_DESCRIPTORS[USB_EP_NUM(num)].COUNT_RX = ((size + 1) >> 1) << 10;
         else
-            USB_BUFFER_DESCRIPTORS[USB_EP_NUM(num)].COUNT_RX = ((((size + 3) >> 2) - 1) << 10) | (1 << 15);
+            USB_BUFFER_DESCRIPTORS[USB_EP_NUM(num)].COUNT_RX = ((((size + 31) >> 5) - 1) << 10) | (1 << 15);
     }
 
     ep->mps = size;
@@ -433,8 +473,10 @@ static inline void stm32_usb_close_ep(CORE* core, unsigned int num)
 
 static inline void stm32_usb_close_device(CORE* core)
 {
+#ifndef STM32F1
     //disable pullup
     USB->BCDR &= ~USB_BCDR_DPPU;
+#endif //STM32F1
 
     int i;
     //disable interrupts
@@ -588,7 +630,7 @@ static inline void stm32_usb_ep_request(CORE* core, IPC* ipc)
         stm32_usb_ep_clear_stall(core, ipc->param1);
         break;
     case USB_EP_IS_STALL:
-        ipc->param2 = stm32_usb_ep_is_stall(core, ipc->param1);
+        ipc->param2 = stm32_usb_ep_is_stall(ipc->param1);
         break;
     case IPC_READ:
         stm32_usb_read(core, ipc);

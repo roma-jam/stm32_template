@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -227,6 +227,8 @@ static inline void lpc_flash_write(CORE* core, HANDLE process, HANDLE user, IO* 
         error(ERROR_NOT_CONFIGURED);
         return;
     }
+    if ((stack->flags & STORAGE_MASK_MODE) == STORAGE_FLAG_ERASE_ONLY)
+        size *= FLASH_PAGE_SIZE;
     if ((user != core->flash.user) || (size == 0) || (size % FLASH_PAGE_SIZE))
     {
         error(ERROR_INVALID_PARAMS);

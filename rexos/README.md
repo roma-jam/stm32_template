@@ -65,14 +65,14 @@ unavailable, another HPET timer can be used for RTC emulation
   * cortex-m4
   * ARM7
 - Drivers:
-  * core (PIN/GPIO, UART, TIMER, POWER): STM32F0, STM32F1, STM32F2, STM32F4, STM32L0, LPC11Uxx, LPC18xx
+  * core (PIN/GPIO, UART, TIMER, POWER): STM32F0, STM32F1, STM32F2, STM32F4, STM32L0, LPC11Uxx, LPC18xx, CC26x0
   * rtc: STM32F0, STM32F1, STM32F2, STM32F4, STM32L0
   * wdt: STM32F0, STM32F1, STM32F2, STM32F4, STM32L0
   * EEPROM: LPC11Uxx, STM32L0
-  * I2C: LPC1Uxx, LPC18xx
+  * I2C: LPC1Uxx, LPC18xx, STM32F0
   * ADC: STM32F1, STM32L0
   * DAC: STM32F1, STM32L0
-  * USB: STM32F1_CL, STM32F0, STM32L0, LPC11Uxx, LPC18xx
+  * USB: STM32F1, STM32F0, STM32L0, LPC11Uxx, LPC18xx
   * ETH: STM32F1, LPC18xx
   * SD/MMC: LPC18xx
   * flash: LPC18xx
@@ -90,6 +90,24 @@ ARM7 features:
 
 History
 =======
+0.5.2
+- TI CC26x0 support
+- stream write critical fix
+
+0.5.1 
+- PIN hal abstraction
+- fix critical kipc_post error on exodrivers
+- USB sync method to avoid driver post overflow
+
+0.5.0
+- kernel-kernel IPC calls. Exodrivers support. Experimental feature
+- isr own error processing
+- non-block stream ISR/kernel access
+- support for early hardware init
+- support for cortex-mX custom flash layout
+- no more generated asm_defines.h
+- STM32 F102, F103 USB driver support. Thanks to zurabob
+
 0.4.9
 - LPC18xx flash storage interface
 - Block error rate for filesystem over flash support

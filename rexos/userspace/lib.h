@@ -1,14 +1,11 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
 #ifndef LIB_H
 #define LIB_H
-
-#include "svc.h"
-#include "error.h"
 
 typedef enum {
     LIB_ID_STD = 0,

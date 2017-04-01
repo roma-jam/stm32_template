@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -243,8 +243,24 @@
 #define I2C_COUNT           2
 #endif
 
-#if defined(STM32F030) || defined(STM32F070)
-#define STM32F0x0
+#if defined(STM32F030) || defined(STM32F031) || defined(STM32F038)
+#define STM32F03x
+#endif
+
+#if defined(STM32F042) || defined(STM32F048)
+#define STM32F04x
+#endif
+
+#if defined(STM32F051) || defined(STM32F058)
+#define STM32F05x
+#endif
+
+#if defined(STM32F071) || defined(STM32F072) || defined(STM32F078)
+#define STM32F07x
+#endif
+
+#if defined(STM32F091) || defined(STM32F098)
+#define STM32F09x
 #endif
 
 #if defined(STM32F031) || defined(STM32F051) || defined(STM32F071) || defined(STM32F091)
@@ -814,12 +830,6 @@
 #endif
 #endif //STM32L0 || STM32F0
 
-#if defined(CORTEX_M3) || defined(CORTEX_M0)
-#ifndef CORTEX_M
-#define CORTEX_M
-#endif
-#endif
-
 #if defined(STM32)
 #ifndef FLASH_BASE
 #define FLASH_BASE                0x08000000
@@ -846,6 +856,7 @@
 #elif defined(STM32L0)
 #include "stm32l0xx.h"
 #endif
+
 #endif //!defined(LDS) && !defined(__ASSEMBLER__)
 
 #ifdef USB_EP_BULK

@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -8,6 +8,7 @@
 #include "tcpips_private.h"
 #include "../../userspace/stdio.h"
 #include "../../userspace/endian.h"
+#include "../../userspace/error.h"
 #include "macs.h"
 #include "ips.h"
 

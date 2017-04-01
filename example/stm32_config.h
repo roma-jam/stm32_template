@@ -18,7 +18,7 @@
 #define STM32_USB_DRIVER                        1
 //------------------------------ CORE ------------------------------------------------
 //Sizeof CORE process stack. Adjust, if monolith UART/USB/Analog/etc is used
-#define STM32_CORE_PROCESS_SIZE                 1024
+#define STM32_CORE_PROCESS_SIZE                 780
 
 //disable only for power saving if no EXTI or remap is used
 #define SYSCFG_ENABLED                          1

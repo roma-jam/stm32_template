@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -33,6 +33,7 @@ typedef enum {
     HAL_SYSTEM = 0,
     //real hardware
     HAL_PIN,
+    HAL_GPIO,
     HAL_POWER,
     HAL_TIMER,
     HAL_RTC,
@@ -47,6 +48,7 @@ typedef enum {
     HAL_FLASH,
     HAL_EEPROM,
     HAL_SDMMC,
+    HAL_RF,
     //device stacks
     HAL_USBD,
     HAL_USBD_IFACE,
@@ -61,23 +63,31 @@ typedef enum {
     HAL_HTTP,
     HAL_TLS,
     HAL_PINBOARD,
+    //virtual file system
     HAL_VFS,
+    //bluetooth host/controller
+    HAL_BLUETOOTH,
     //application level
     HAL_APP
 } HAL;
 
 //ipc contains IO in param2
-#define HAL_IO_FLAG                                         (1 << 15)
+#define HAL_MODE                                            (3 << 30)
+#define HAL_IO_MODE                                         (1ul << 30)
+#define HAL_HEAP_MODE                                       (2ul << 30)
 //response required
-#define HAL_REQ_FLAG                                        (1 << 31)
+#define HAL_REQ_FLAG                                        (1ul << 15)
 
-#define HAL_CMD(group, item)                                ((((group) & 0x7fff) << 16) | ((item) & 0x7fff))
-#define HAL_REQ(group, item)                                ((((group) & 0x7fff) << 16) | ((item) & 0x7fff) | HAL_REQ_FLAG)
+#define HAL_CMD(group, item)                                ((((group) & 0x3fff) << 16) | ((item) & 0x7fff))
+#define HAL_REQ(group, item)                                ((((group) & 0x3fff) << 16) | ((item) & 0x7fff) | HAL_REQ_FLAG)
 #define HAL_ITEM(cmd)                                       ((cmd) & 0x7fff)
-#define HAL_GROUP(cmd)                                      (((cmd) >> 16) & 0x7fff)
+#define HAL_GROUP(cmd)                                      (((cmd) >> 16) & 0x3fff)
 
-#define HAL_IO_CMD(group, item)                             ((((group) & 0x7fff) << 16) | ((item) & 0x7fff) | HAL_IO_FLAG)
-#define HAL_IO_REQ(group, item)                             ((((group) & 0x7fff) << 16) | ((item) & 0x7fff) | HAL_IO_FLAG | HAL_REQ_FLAG)
+#define HAL_IO_CMD(group, item)                             ((((group) & 0x3fff) << 16) | ((item) & 0x7fff) | HAL_IO_MODE)
+#define HAL_IO_REQ(group, item)                             ((((group) & 0x3fff) << 16) | ((item) & 0x7fff) | HAL_IO_MODE | HAL_REQ_FLAG)
+
+#define HAL_HEAP_CMD(group, item)                           ((((group) & 0x3fff) << 16) | ((item) & 0x7fff) | HAL_HEAP_MODE)
+#define HAL_HEAP_REQ(group, item)                           ((((group) & 0x3fff) << 16) | ((item) & 0x7fff) | HAL_HEAP_MODE | HAL_REQ_FLAG)
 
 #define ANY_CMD                                             0xffffffff
 
@@ -121,6 +131,16 @@ void ipc_post(IPC* ipc);
     \retval none
 */
 void ipc_post_inline(HANDLE process, unsigned int cmd, unsigned int param1, unsigned int param2, unsigned int param3);
+
+/**
+    \brief post IPC, inline version for exo driver
+    \param cmd: command
+    \param param1: cmd-specific param1
+    \param param2: cmd-specific param2
+    \param param3: cmd-specific param3
+    \retval none
+*/
+#define ipc_post_exo(cmd, param1, param2, param3)                   ipc_post_inline(KERNEL_HANDLE, (cmd), (param1), (param2), (param3))
 
 /**
     \brief post IPC
@@ -199,7 +219,19 @@ void ack(HANDLE process, unsigned int cmd, unsigned int param1, unsigned int par
 unsigned int get(HANDLE process, unsigned int cmd, unsigned int param1, unsigned int param2, unsigned int param3);
 
 /**
-    \brief get hangle value from process.
+    \brief get value from driver
+    \details Error set if param3 is negative
+    \param cmd: command to post
+    \param param1: cmd specific
+    \param param2: cmd specific
+    \param param3: cmd specific
+    \retval returned param2
+*/
+
+#define get_exo(cmd, param1, param2, param3)                        get(KERNEL_HANDLE, (cmd), (param1), (param2), param3)
+
+/**
+    \brief get hangle value from process
     \details INVALID_HANDLE on error
     \param cmd: command to post
     \param process: IPC receiver
@@ -210,6 +242,18 @@ unsigned int get(HANDLE process, unsigned int cmd, unsigned int param1, unsigned
 */
 
 unsigned int get_handle(HANDLE process, unsigned int cmd, unsigned int param1, unsigned int param2, unsigned int param3);
+
+/**
+    \brief get hangle value from driver
+    \details INVALID_HANDLE on error
+    \param cmd: command to post
+    \param param1: cmd specific
+    \param param2: cmd specific
+    \param param3: cmd specific
+    \retval param1
+*/
+
+#define get_handle_exo(cmd, param1, param2, param3)                 get_handle(KERNEL_HANDLE, (cmd), (param1), (param2), param3)
 
 /**
     \brief get size (positive) value from process.
@@ -223,6 +267,18 @@ unsigned int get_handle(HANDLE process, unsigned int cmd, unsigned int param1, u
 */
 
 int get_size(HANDLE process, unsigned int cmd, unsigned int param1, unsigned int param2, unsigned int param3);
+
+/**
+    \brief get size (positive) value from driver
+    \details Error set if param3 is negative
+    \param cmd: command to post
+    \param param1: cmd specific
+    \param param2: cmd specific
+    \param param3: cmd specific
+    \retval param3
+*/
+
+#define get_size_exo(cmd, param1, param2, param3)                   get_size(KERNEL_HANDLE, (cmd), (param1), (param2), param3)
 
 /** \} */ // end of sem group
 

@@ -8,7 +8,7 @@
 #define CONFIG_H
 
 #define USB_PORT_NUM                                USB_0
-#define USBD_PROCESS_SIZE                           900
+#define USBD_PROCESS_SIZE                           1200
 #define USBD_PROCESS_PRIORITY                       150
 
 #define ETH_PHY_ADDRESS                             0x1f

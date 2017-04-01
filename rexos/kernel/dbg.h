@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -19,13 +19,10 @@
 
 #define MAGIC_TIMER                                    0xbecafcf5
 #define MAGIC_PROCESS                                  0x7de32076
-#define MAGIC_MUTEX                                    0xd0cc6e26
-#define MAGIC_EVENT                                    0x57e198c7
-#define MAGIC_SEM                                      0xabfd92d9
 #define MAGIC_STREAM                                   0xf4eb741c
 #define MAGIC_STREAM_HANDLE                            0x250b73c2
-#define MAGIC_BLOCK                                    0x890f6c75
 #define MAGIC_KIO                                      0x890f6c75
+#define MAGIC_HEAP                                     0xd0cc6e26
 
 #define MAGIC_UNINITIALIZED                            0xcdcdcdcd
 #define MAGIC_UNINITIALIZED_BYTE                       0xcd
@@ -39,32 +36,12 @@
 #include "../userspace/stdlib.h"
 #include "../userspace/cc_macro.h"
 
-#if (KERNEL_DEVELOPER_MODE)
-
-
 /**
     \brief halts system macro
     \details only works, if \ref KERNEL_DEBUG is set
     \retval no return
 */
 #define HALT()                                           {for (;;) {}}
-
-/**
-    \brief debug assertion
-    \details only works, if \ref KERNEL_DEBUG is set.
-
-    prints over debug console file name and line, caused assertion
-    \param cond: assertion made if \b cond is \b false
-    \retval no return if not \b cond, else none
-*/
-#define ASSERT(cond)                                    if (!(cond))    {printk("ASSERT at %s, line %d\n", __FILE__, __LINE__);    HALT();}
-
-#else
-
-#define HALT()
-#define ASSERT(cond)
-
-#endif
 
 #if (KERNEL_MARKS)
 
@@ -76,11 +53,9 @@
     \param name: object text to display in case of wrong magic
     \retval no return if wrong magic, else none
 */
-#if (KERNEL_DEVELOPER_MODE)
-#define CHECK_MAGIC(obj, magic_value)    if ((obj)->magic != (magic_value)) {printk("INVALID MAGIC at %s, line %d\n", __FILE__, __LINE__);    HALT();}
-#else
-#define CHECK_MAGIC(obj, magic_value)    if ((obj)->magic != (magic_value)) {kprocess_error_current(ERROR_INVALID_MAGIC); return;}
-#endif
+#define CHECK_MAGIC(obj, magic_value)    if (((HANDLE)(obj) != KERNEL_HANDLE) && (((HANDLE)(obj) == INVALID_HANDLE) || ((HANDLE)(obj) == ANY_HANDLE) || \
+                                         ((obj)->magic != (magic_value)))) {printk("INVALID MAGIC at %s, line %d\n", __FILE__, __LINE__);    panic();}
+
 /**
     \brief apply object magic on object creation
     \details only works, if \ref KERNEL_DEBUG and \ref KERNEL_MARKS are set.
@@ -106,28 +81,15 @@
 #define MAGIC
 #endif //KERNEL_MARKS
 
-#if (KERNEL_HANDLE_CHECKING)
-#if (KERNEL_DEVELOPER_MODE)
-#define CHECK_HANDLE(handle, size)     if ((HANDLE)(handle) == INVALID_HANDLE || (HANDLE)(handle) == ANY_HANDLE || (HANDLE)(handle) == KERNEL_HANDLE) \
-                                            {printk("INVALID HANDLE at %s, line %d, caller process: %s\n", __FILE__, __LINE__, kprocess_name(kprocess_get_current()));    HALT();}
-#else
-#define CHECK_HANDLE(handle, size)     if ((HANDLE)(handle) == INVALID_HANDLE || (HANDLE)(handle) == ANY_HANDLE || (HANDLE)(handle) == KERNEL_HANDLE) \
-                                            {kprocess_error_current(ERROR_INVALID_MAGIC); return;}
-#endif
-#else
-#define CHECK_HANDLE(handle, size)
-#endif //KERNEL_HANDLE_CHECKING
-
 #if (KERNEL_ADDRESS_CHECKING)
-#if (KERNEL_DEVELOPER_MODE)
-#define CHECK_ADDRESS(process, address, sz)     if (!kprocess_check_address((KPROCESS*)(process), (address), (sz))) \
-                                                    {printk("INVALID ADDRESS at %s, line %d, process: %s\n", __FILE__, __LINE__, kprocess_name((KPROCESS*)(process)));    HALT();}
-#else
-#define CHECK_ADDRESS(process, address, sz)     if (!kprocess_check_address((KPROCESS*)(process), (address), (sz))) \
-                                                     {kprocess_error_current(ERROR_ACCESS_DENIED); return;}
-#endif //KERNEL_DEVELOPER_MODE
+#define CHECK_ADDRESS(process, address, sz)     if (!kprocess_check_address((process), (address), (sz))) \
+                                                    {printk("INVALID ADDRESS at %s, line %d, process: %s\n", __FILE__, __LINE__, kprocess_name((HANDLE)(process)));    panic();}
+#define CHECK_IO_ADDRESS(process, ipc)          if (((IPC*)(ipc))->cmd & HAL_IO_FLAG) { \
+                                                    if (!kprocess_check_address((process), (HANDLE*)(ipc)->param2, sizeof(HANDLE))) \
+                                                        {printk("INVALID IO ADDRESS at %s, line %d, process: %s\n", __FILE__, __LINE__, kprocess_name((HANDLE)(process)));    panic();}
 #else
 #define CHECK_ADDRESS(process, address, size)
+#define CHECK_IO_ADDRESS(process, ipc)
 #endif //KERNEL_ADDRESS_CHECKING
 
 /**

@@ -23,8 +23,7 @@ USERSPACE                   = $(REXOS)/userspace
 LIB                         = $(REXOS)/lib
 LDS_SCRIPT                  = $(KERNEL)/arm.ld.S
 #----------------------------------------------------------
-LIBS_DIR                    = $(REXOS)/3rdparty
-CMSIS_DIR                   = $(LIBS_DIR)/CMSIS
+CMSIS_DIR                   = $(REXOS)/CMSIS
 #CMSIS_DEVICE_DIR            = $(CMSIS_DIR)/Device/ST/STM32L0xx
 CMSIS_DEVICE_DIR            = $(CMSIS_DIR)/Device/ST/STM32F10x
 #CMSIS_DEVICE_DIR           = $(CMSIS_DIR)/Device/ST/STM32F2xx
@@ -53,27 +52,27 @@ SRC_C                      += kernel.c dbg.c kstdlib.c karray.c kso.c kirq.c kpr
 #lib
 SRC_C                      += lib_lib.c lib_systime.c pool.c printf.c lib_std.c lib_stdio.c lib_array.c lib_so.c
 #drv
-SRC_C                      += stm32_pin.c stm32_gpio.c stm32_power.c stm32_timer.c stm32_core.c stm32_uart.c stm32_usb_f103xx.c
+SRC_C                      += stm32_pin.c stm32_gpio.c stm32_power.c stm32_timer.c stm32_rtc.c stm32_core.c stm32_uart.c stm32_usb.c
 #userspace lib
-SRC_C                      += ipc.c io.c process.c stdio.c stdlib.c systime.c time.c uart.c usb.c power.c
+SRC_C                      += ipc.c io.c process.c stdio.c stdlib.c systime.c time.c uart.c usb.c power.c stream.c pin.c
 #SRC_C                      += eth.c tcpip.c mac.c icmp.c ip.c arp.c tcp.c
 #midware
 SRC_C                      += usbd.c cdc_acmd.c 
 #SRC_C 						+= eth_phy.c tcpips.c macs.c routes.c arps.c ips.c icmps.c tcps.c
 #userspace lib
-SRC_C                      += app.c comm.c 
+SRC_C                      += app.c comm.c
 
 OBJ                         = $(SRC_AS:%.S=%.o) $(SRC_C:%.c=%.o)
 #----------------------------------------------------------
 DEFINES                     = -D$(MCU)
-MCU_FLAGS                   = -mcpu=cortex-m3 -mthumb -D__CORTEX_M3 -D__thumb2__=1 -mtune=cortex-m3 -msoft-float -mapcs-frame -std=gnu99 -g3
-NO_DEFAULTS                 = -fdata-sections -ffunction-sections -fno-hosted -fno-builtin -nostdlib -nodefaultlibs
+MCU_FLAGS                   = -mcpu=cortex-m3 -mthumb -D__CORTEX_M3 -D__thumb2__=1 -mtune=cortex-m3 -msoft-float -mapcs-frame
+NO_DEFAULTS                 = -fdata-sections -ffunction-sections -fno-hosted -fno-builtin  -nostdlib -nodefaultlibs
 FLAGS_CC                    = $(INCLUDES) $(DEFINES) -I. -O$(OPTIMIZATION) -Wall -c -fmessage-length=0 $(MCU_FLAGS) $(NO_DEFAULTS)
 FLAGS_LD                    = -Xlinker --gc-sections $(MCU_FLAGS)
 #----------------------------------------------------------
 all: $(TARGET_NAME).elf
 
-%.elf: asm_defines.h $(OBJ) $(LDS_SCRIPT)
+%.elf: $(OBJ) $(LDS_SCRIPT)
 	@$(GCC) $(INCLUDES) -I. $(DEFINES) -DLDS -E $(LDS_SCRIPT) -o $(BUILD_DIR)/script.ld.hash
 	@awk '!/^(\ )*#/ {print $0}' $(BUILD_DIR)/script.ld.hash > $(BUILD_DIR)/script.ld
 	@echo LD: $(OBJ)
@@ -92,13 +91,10 @@ all: $(TARGET_NAME).elf
 	@echo CC: $<
 	@$(GCC) $(FLAGS_CC) -c ./$< -o $(BUILD_DIR)/$@
 
-.S.o: asm_defines.h
+.S.o:
 	@-mkdir -p $(BUILD_DIR)
 	@echo AS_C: $<
 	@$(GCC) $(INCLUDES) -I. $(DEFINES) -c -x assembler-with-cpp ./$< -o $(BUILD_DIR)/$@
-
-asm_defines.h: asm_defines.c
-	$(GCC) $(FLAGS_CC) -S $< -o - | awk '($$1 == "->") { print "#define " $$2 " " $$3 }' > $@
 
 program:
 #	@st-flash write $(OUTPUT_DIR)/$(TARGET_NAME).bin 0x8000000

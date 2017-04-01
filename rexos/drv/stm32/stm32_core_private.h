@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -12,26 +12,17 @@
 #include "stm32_pin.h"
 #include "stm32_timer.h"
 #include "stm32_power.h"
-#if (STM32_UART_DRIVER)
 #include "stm32_uart.h"
-#endif // STM32_UART_DRIVER
-#if (STM32_DAC_DRIVER)
 #include "stm32_dac.h"
-#endif // STM32_DAC_DRIVER
-#if (STM32_ADC_DRIVER)
 #include "stm32_adc.h"
-#endif // STM32_ADC_DRIVER
 #if (STM32_I2C_DRIVER)
 #include "stm32_i2c.h"
-#endif // STM32_I2C_DRIVER
-
-#if (STM32_USB_DRIVER)
+#endif //STM32_I2C_DRIVER
 #ifdef STM32F10X_CL
 #include "stm32_otg.h"
 #else
 #include "stm32_usb.h"
 #endif
-#endif // STM32_USB_DRIVER
 
 typedef struct _CORE {
     GPIO_DRV gpio;

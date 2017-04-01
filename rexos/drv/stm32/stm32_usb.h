@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -11,8 +11,8 @@
 #include "../../userspace/ipc.h"
 #include "../../userspace/io.h"
 #include "stm32_config.h"
-#include "stm32_core.h"
 #include "sys_config.h"
+#include "stm32_core.h"
 
 typedef struct {
     IO* io;

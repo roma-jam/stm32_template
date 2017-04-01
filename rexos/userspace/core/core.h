@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -13,6 +13,13 @@
 
 #include "../stm32/stm32.h"
 #include "../lpc/lpc.h"
+#include "../ti/ti.h"
+
+#if defined(CORTEX_M3) || defined(CORTEX_M0) || defined(CORTEX_M4)
+#ifndef CORTEX_M
+#define CORTEX_M
+#endif //CORTEX_M
+#endif //defined(CORTEX_M3) || defined(CORTEX_M0) || defined(CORTEX_M4)
 
 #ifdef CORTEX_M
 #ifndef SRAM_BASE

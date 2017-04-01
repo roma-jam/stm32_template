@@ -18,6 +18,7 @@
 #include "../rexos/userspace/power.h"
 #include "../rexos/midware/pinboard.h"
 #include "../rexos/userspace/adc.h"
+#include "../rexos/userspace/pin.h"
 #include "app_private.h"
 #include "comm.h"
 #include "net.h"
@@ -65,7 +66,7 @@ static inline void stat()
 static inline void app_setup_dbg()
 {
     BAUD baudrate;
-    ack(object_get(SYS_OBJ_CORE), HAL_REQ(HAL_PIN, STM32_GPIO_ENABLE_PIN), DBG_CONSOLE_TX_PIN, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false);
+    pin_enable(DBG_CONSOLE_TX_PIN, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false);
     uart_open(DBG_CONSOLE, UART_MODE_STREAM | UART_TX_STREAM);
     baudrate.baud = DBG_CONSOLE_BAUD;
     baudrate.data_bits = 8;

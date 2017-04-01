@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -20,7 +20,7 @@ static void process_fault(unsigned int ret_value)
     //from thread context, just killing thread
     if (ret_value == PSP_IN_LR)
     {
-        kprocess_destroy_current();
+        kprocess_destroy(kprocess_get_current());
         SCB_CFSR = 0;
     }
     else

@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -10,6 +10,7 @@
 #include "../../userspace/stdio.h"
 #include "../../userspace/endian.h"
 #include "../../userspace/systime.h"
+#include "../../userspace/error.h"
 #include "icmps.h"
 #include <string.h>
 

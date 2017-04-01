@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -59,26 +59,21 @@ typedef enum {
     SVC_STREAM_STOP_LISTEN,
     SVC_STREAM_WRITE,
     SVC_STREAM_READ,
+    SVC_STREAM_WRITE_NO_BLOCK,
+    SVC_STREAM_READ_NO_BLOCK,
     SVC_STREAM_FLUSH,
     SVC_STREAM_DESTROY,
-
-    SVC_DIRECT_READ,
-    SVC_DIRECT_WRITE,
-
-    SVC_BLOCK_CREATE,
-    SVC_BLOCK_OPEN,
-    SVC_BLOCK_CLOSE,
-    SVC_BLOCK_GET_SIZE,
-    SVC_BLOCK_SEND,
-    SVC_BLOCK_SEND_IPC,
-    SVC_BLOCK_RETURN,
-    SVC_BLOCK_DESTROY,
 
     SVC_IO_CREATE,
     SVC_IO_DESTROY,
 
     SVC_OBJECT_SET,
     SVC_OBJECT_GET,
+
+    SVC_HEAP_CREATE,
+    SVC_HEAP_DESTROY,
+    SVC_HEAP_MALLOC,
+    SVC_HEAP_FREE,
 
     SVC_ADD_POOL,
     SVC_SETUP_DBG,

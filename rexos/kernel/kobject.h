@@ -1,6 +1,6 @@
 /*
     RExOS - embedded RTOS
-    Copyright (c) 2011-2016, Alexey Kramarenko
+    Copyright (c) 2011-2017, Alexey Kramarenko
     All rights reserved.
 */
 
@@ -10,7 +10,7 @@
 #include "../userspace/types.h"
 
 void kobject_init();
-void kobject_set(int idx, HANDLE handle);
-void kobject_get(int idx, HANDLE* handle);
+void kobject_set(HANDLE process, int idx, HANDLE handle);
+HANDLE kobject_get(int idx);
 
 #endif // KOBJECT_H

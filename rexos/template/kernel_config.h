@@ -1,3 +1,9 @@
+/*
+    RExOS - embedded RTOS
+    Copyright (c) 2011-2017, Alexey Kramarenko
+    All rights reserved.
+*/
+
 #ifndef KERNEL_CONFIG_H
 #define KERNEL_CONFIG_H
 
@@ -25,7 +31,5 @@
 #define KERNEL_IPC_DEBUG                            0
 //maximum number of global handles. Must be at least 1
 #define KERNEL_OBJECTS_COUNT                        5
-//block, direct are now deprecated
-#define KERNEL_BD                                   0
 
 #endif // KERNEL_CONFIG_H
