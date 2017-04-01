@@ -18,6 +18,9 @@
 #if (STM32_I2C_DRIVER)
 #include "stm32_i2c.h"
 #endif //STM32_I2C_DRIVER
+#if (STM32_SPI_DRIVER)
+#include "stm32_spi.h"
+#endif //STM32_SPI_DRIVER
 #ifdef STM32F10X_CL
 #include "stm32_otg.h"
 #else
@@ -40,6 +43,9 @@ typedef struct _CORE {
 #if (STM32_I2C_DRIVER)
     I2C_DRV i2c;
 #endif //STM32_I2C_DRIVER
+#if (STM32_SPI_DRIVER)
+    SPI_DRV spi;
+#endif //STM32_SPI_DRIVER
 #if (STM32_USB_DRIVER)
     USB_DRV usb;
 #endif //STM32_USB_DRIVER

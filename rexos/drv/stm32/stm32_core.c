@@ -92,6 +92,11 @@ void stm32_core_loop(CORE* core)
             stm32_i2c_request(core, &ipc);
             break;
 #endif //STM32_I2C_DRIVER
+#if (STM32_SPI_DRIVER)
+        case HAL_SPI:
+            stm32_spi_request(core, &ipc);
+            break;
+#endif //STM32_SPI_DRIVER
 #if (STM32_USB_DRIVER)
         case HAL_USB:
 #ifdef STM32F10X_CL
@@ -141,6 +146,9 @@ void stm32_core()
 #if (STM32_I2C_DRIVER)
     stm32_i2c_init(&core);
 #endif //STM32_I2C_DRIVER
+#if (STM32_SPI_DRIVER)
+    stm32_spi_init(&core);
+#endif //STM32_SPI_DRIVER
 #if (STM32_USB_DRIVER)
 #ifdef STM32F10X_CL
     stm32_otg_init(&core);

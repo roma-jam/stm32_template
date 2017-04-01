@@ -558,6 +558,9 @@
 #define UARTS_COUNT                                             2
 #elif defined(STM32F10X_MD) || defined(STM32F10X_MD_VL)
 #define UARTS_COUNT                                             3
+#define I2C_COUNT                                               2
+#define SPI_COUNT                                               2
+#define CAN_COUNT                                               1
 #else
 #define UARTS_COUNT                                             5
 #endif

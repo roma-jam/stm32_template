@@ -63,6 +63,18 @@ static inline void stat()
     process_info();
 }
 
+static inline void app_disable_JTAG()
+{
+    // Disable JTAG
+    bool was_enabled = (RCC->APB2ENR & RCC_APB2ENR_AFIOEN);
+    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+    uint32_t tmp = AFIO->MAPR;
+    tmp &= ~AFIO_MAPR_SWJ_CFG;
+    tmp |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+    AFIO->MAPR = tmp;
+    if (!was_enabled) RCC->APB2ENR &= ~RCC_APB2ENR_AFIOEN;
+}
+
 static inline void app_setup_dbg()
 {
     BAUD baudrate;
@@ -82,29 +94,13 @@ static inline void app_init(APP* app)
 {
     process_create(&__STM32_CORE);
 
-    // Disable JTAG
-    bool was_enabled = (RCC->APB2ENR & RCC_APB2ENR_AFIOEN);
-    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-    uint32_t tmp = AFIO->MAPR;
-    tmp &= ~AFIO_MAPR_SWJ_CFG;
-    tmp |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
-    AFIO->MAPR = tmp;
-    if (!was_enabled) RCC->APB2ENR &= ~RCC_APB2ENR_AFIOEN;
+    app_disable_JTAG();
 
-    gpio_enable_pin(B0, GPIO_MODE_OUT);
-    gpio_set_pin(B0);
+    gpio_enable_pin(C8, GPIO_MODE_OUT);
+    gpio_set_pin(C8);
 
     app_setup_dbg();
-    app->timer = timer_create(0, HAL_APP);
-//    timer_start_ms(app->timer, 1000);
-
     printf("App init\n");
-}
-
-static inline void app_timeout(APP* app)
-{
-    printf("app timer timeout test\n");
-    timer_start_ms(app->timer, 1000);
 }
 
 void app()
@@ -113,20 +109,12 @@ void app()
     IPC ipc;
 
     app_init(&app);
-    comm_init(&app);
-    comm_connect(&app);
 
     for (;;)
     {
         ipc_read(&ipc);
         switch (HAL_GROUP(ipc.cmd))
         {
-        case HAL_USBD:
-            comm_request(&app, &ipc);
-            break;
-        case HAL_APP:
-            app_timeout(&app);
-            break;
         default:
             error(ERROR_NOT_SUPPORTED);
             break;
