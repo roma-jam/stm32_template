@@ -8,23 +8,18 @@
 #include "../rexos/userspace/stdlib.h"
 #include "../rexos/userspace/process.h"
 #include "../rexos/userspace/sys.h"
-#include "../rexos/userspace/gpio.h"
 #include "../rexos/userspace/stm32/stm32_driver.h"
 #include "../rexos/userspace/ipc.h"
-#include "../rexos/userspace/systime.h"
-#include "../rexos/userspace/wdt.h"
 #include "../rexos/userspace/uart.h"
 #include "../rexos/userspace/process.h"
 #include "../rexos/userspace/power.h"
-#include "../rexos/midware/pinboard.h"
-#include "../rexos/userspace/adc.h"
 #include "../rexos/userspace/pin.h"
-#include "../rexos/userspace/spi.h"
+#include "../rexos/userspace/gpio.h"
 #include "app_private.h"
 #include "comm.h"
-#include "net.h"
 #include "config.h"
-#include <string.h>
+
+#include "cc11xx/cc1101.h"
 
 void app();
 
@@ -107,30 +102,15 @@ static inline void app_init(APP* app)
 void app()
 {
     APP app;
+    CC1101 cc1101;
     IPC ipc;
 
     app_init(&app);
 
-    gpio_enable_pin(A4, GPIO_MODE_OUT); // NSS
-    gpio_set_pin(A4);
-    pin_enable(A5, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false); // SCK
-    pin_enable(A6, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false); // MISO
-    pin_enable(A7, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false); // MOSI
+    cc1101_hw_init(&cc1101);
 
-    spi_open(SPI_1, SPI_MODE_MASTER | SPI_DATA_CK_IDLE_HIGH | SPI_DATA_SECOND_EDGE | SPI_BAUDRATE_DIV4);
-
-    IO* io = io_create(32);
-    memset((uint8_t*)io_data(io), 0x8A, 32);
-    io->data_size = 32;
-
-    SYSTIME time;
-    get_uptime(&time);
-    int res = spi_data(SPI_1, io, 32);
-    int us = systime_elapsed_us(&time);
-
-    printf("exchange %d bytes, %d us\n", res, us);
-
-    io_destroy(io);
+    sleep_ms(1000);
+    process_info();
 
     for (;;)
     {
