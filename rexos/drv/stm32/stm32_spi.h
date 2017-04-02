@@ -14,24 +14,11 @@
 #include "../../userspace/process.h"
 #include <stdbool.h>
 
-typedef enum {
-    I2C_IO_MODE_IDLE = 0,
-    I2C_IO_MODE_TX,
-    I2C_IO_MODE_RX
-} SPI_IO_MODE;
-
-typedef enum {
-    I2C_STATE_ADDR = 0,
-    I2C_STATE_LEN,
-    I2C_STATE_DATA
-} SPI_STATE;
-
 typedef struct  {
     IO* io;
     HANDLE process;
-    SPI_IO_MODE io_mode;
-    SPI_STATE state;
-    unsigned int size;
+    int tx_length;
+    unsigned int rx_length;
 } SPI;
 
 typedef struct  {

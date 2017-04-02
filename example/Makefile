@@ -56,7 +56,7 @@ SRC_C                      += lib_lib.c lib_systime.c pool.c printf.c lib_std.c 
 SRC_C                      += stm32_pin.c stm32_gpio.c stm32_power.c stm32_timer.c stm32_rtc.c stm32_core.c stm32_uart.c
 SRC_C						+= stm32_spi.c
 #userspace lib
-SRC_C                      += ipc.c io.c process.c stdio.c stdlib.c systime.c time.c uart.c power.c stream.c pin.c
+SRC_C                      += ipc.c io.c process.c stdio.c stdlib.c systime.c time.c uart.c power.c stream.c pin.c spi.c
 #SRC_C                      += eth.c tcpip.c mac.c icmp.c ip.c arp.c tcp.c
 #midware
 #SRC_C                      += usbd.c cdc_acmd.c 

@@ -19,11 +19,12 @@
 #include "../rexos/midware/pinboard.h"
 #include "../rexos/userspace/adc.h"
 #include "../rexos/userspace/pin.h"
+#include "../rexos/userspace/spi.h"
 #include "app_private.h"
 #include "comm.h"
 #include "net.h"
 #include "config.h"
-
+#include <string.h>
 
 void app();
 
@@ -100,7 +101,7 @@ static inline void app_init(APP* app)
     gpio_set_pin(C8);
 
     app_setup_dbg();
-    printf("App init\n");
+//    printf("App init\n");
 }
 
 void app()
@@ -109,6 +110,22 @@ void app()
     IPC ipc;
 
     app_init(&app);
+
+    gpio_enable_pin(A4, GPIO_MODE_OUT); // NSS
+    gpio_set_pin(A4);
+    pin_enable(A5, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false); // SCK
+    pin_enable(A6, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false); // MISO
+    pin_enable(A7, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false); // MOSI
+
+    spi_open(SPI_1, SPI_MODE_MASTER | SPI_DATA_CK_IDLE_HIGH | SPI_DATA_SECOND_EDGE | SPI_BAUDRATE_DIV16);
+
+    IO* io = io_create(32);
+    memset((uint8_t*)io_data(io), 0x8A, 32);
+    io->data_size = 32;
+
+    spi_write(SPI_1, io);
+
+    io_destroy(io);
 
     for (;;)
     {
