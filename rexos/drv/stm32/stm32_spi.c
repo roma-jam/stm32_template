@@ -64,22 +64,18 @@ static inline void stm32_spi_on_rx_isr(SPI* spi, SPI_PORT port)
 //    iprintd("spi rx isr %d\n", spi->rx_length);
     spi->rx_length++;
 
-    if(spi->tx_length == 0)
+    if(spi->io->data_size == spi->rx_length)
     {
-        iprintd("spi tx done\n");
+//        iprintd("spi tx done\n");
         spi->io->data_size = spi->rx_length;
-        iio_complete(spi->process, HAL_IO_CMD(HAL_I2C, IPC_READ), port, spi->io);
+        iio_complete(spi->process, HAL_IO_CMD(HAL_SPI, IPC_READ), port, spi->io);
     }
 }
 
 static inline void stm32_spi_on_tx_isr(SPI* spi, SPI_PORT port)
 {
     if(spi->tx_length-- > 0)
-    {
-        iprintd("spi tx isr %d\n", spi->tx_length);
         __SPI_REGS[port]->DR = *(uint8_t*)(io_data(spi->io) + (spi->io->data_size - spi->tx_length));
-    }
-
 }
 
 void stm32_spi_on_isr(int vector, void* param)
@@ -161,7 +157,7 @@ void stm32_spi_close(CORE* core, SPI_PORT port)
     printd("spi close\n");
 }
 
-static void stm32_spi_data_io(CORE* core, IPC* ipc, bool read)
+static void stm32_spi_data_io(CORE* core, IPC* ipc)
 {
     printd("spi io\n");
     SPI_PORT port = (SPI_PORT)ipc->param1;
@@ -177,14 +173,11 @@ static void stm32_spi_data_io(CORE* core, IPC* ipc, bool read)
     spi->tx_length = spi->io->data_size;
     spi->rx_length = 0;
 
-    if(read)
-    {
-        if(spi->tx_length > max_size)
-            spi->tx_length = max_size;
-    }
+    if(spi->tx_length > max_size)
+        spi->tx_length = max_size;
 
-    printd("->%X\r", *(uint8_t*)io_data(spi->io));
     __SPI_REGS[port]->DR = *(uint8_t*)io_data(spi->io);
+    spi->tx_length--;
     //all rest in isr
     error(ERROR_SYNC);
 }
@@ -206,11 +199,8 @@ void stm32_spi_request(CORE* core, IPC* ipc)
         case IPC_CLOSE:
             stm32_spi_close(core, port);
             break;
-        case IPC_WRITE:
-            stm32_spi_data_io(core, ipc, false);
-            break;
         case IPC_READ:
-            stm32_spi_data_io(core, ipc, true);
+            stm32_spi_data_io(core, ipc);
             break;
         default:
             error(ERROR_NOT_SUPPORTED);

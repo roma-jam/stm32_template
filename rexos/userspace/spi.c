@@ -21,12 +21,7 @@ void spi_close(int port)
     ack(object_get(SYS_OBJ_CORE), HAL_REQ(HAL_SPI, IPC_CLOSE), port, 0, 0);
 }
 
-int spi_read(int port, IO* io, unsigned int max_size)
+int spi_data(int port, IO* io, unsigned int max_size)
 {
     return io_read_sync(object_get(SYS_OBJ_CORE), HAL_IO_REQ(HAL_SPI, IPC_READ), port, io, max_size);
-}
-
-int spi_write(int port, IO* io)
-{
-    return io_write_sync(object_get(SYS_OBJ_CORE), HAL_IO_REQ(HAL_SPI, IPC_WRITE), port, io);
 }

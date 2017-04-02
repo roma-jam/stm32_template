@@ -117,13 +117,18 @@ void app()
     pin_enable(A6, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false); // MISO
     pin_enable(A7, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false); // MOSI
 
-    spi_open(SPI_1, SPI_MODE_MASTER | SPI_DATA_CK_IDLE_HIGH | SPI_DATA_SECOND_EDGE | SPI_BAUDRATE_DIV16);
+    spi_open(SPI_1, SPI_MODE_MASTER | SPI_DATA_CK_IDLE_HIGH | SPI_DATA_SECOND_EDGE | SPI_BAUDRATE_DIV4);
 
     IO* io = io_create(32);
     memset((uint8_t*)io_data(io), 0x8A, 32);
     io->data_size = 32;
 
-    spi_write(SPI_1, io);
+    SYSTIME time;
+    get_uptime(&time);
+    int res = spi_data(SPI_1, io, 32);
+    int us = systime_elapsed_us(&time);
+
+    printf("exchange %d bytes, %d us\n", res, us);
 
     io_destroy(io);
 

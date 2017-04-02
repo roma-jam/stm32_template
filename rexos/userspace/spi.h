@@ -47,7 +47,6 @@ typedef enum {
 bool spi_open(int port, unsigned int settings);
 void spi_close(int port);
 
-int spi_read(int port, IO* io, unsigned int max_size);
-int spi_write(int port, IO* io);
+int spi_data(int port, IO* io, unsigned int max_size);
 
 #endif /* SPI_H */
