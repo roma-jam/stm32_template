@@ -77,10 +77,10 @@ static inline void app_setup_dbg()
 static inline void app_init(APP* app)
 {
     process_create(&__STM32_CORE);
+#if (APP_DEBUG)
     app_setup_dbg();
-
     stat();
-
+#endif
 }
 
 void app()
@@ -89,6 +89,7 @@ void app()
     IPC ipc;
 
     app_init(&app);
+//    comm_init(&app);
 
     for (;;)
     {

@@ -29,6 +29,9 @@ typedef enum {
 #if defined(STM32F1)
     #define USB_IRQn                    USB_LP_CAN1_RX0_IRQn
     typedef uint32_t pma_reg;
+#elif defined(STM32L1)
+    #define USB_IRQn                    USB_LP_IRQn
+    typedef uint32_t pma_reg;
 #else
     typedef uint16_t pma_reg;
 #endif //STM32F1
@@ -378,8 +381,13 @@ void stm32_usb_open_device(CORE* core, HANDLE device)
 
 #ifndef STM32F1
     //pullup device
+#if defined(STM32L1)
+    SYSCFG->PMC |=  SYSCFG_PMC_USB_PU;
+#else
     USB->BCDR |= USB_BCDR_DPPU;
+#endif
 #endif //STM32F1
+
 }
 
 static inline void stm32_usb_open_ep(CORE* core, unsigned int num, USB_EP_TYPE type, unsigned int size)
@@ -475,7 +483,11 @@ static inline void stm32_usb_close_device(CORE* core)
 {
 #ifndef STM32F1
     //disable pullup
+#if defined(STM32L1)
+    SYSCFG->PMC &= ~SYSCFG_PMC_USB_PU;
+#else
     USB->BCDR &= ~USB_BCDR_DPPU;
+#endif
 #endif //STM32F1
 
     int i;

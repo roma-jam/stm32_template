@@ -31,7 +31,9 @@ static inline void comm_usb_start(APP* app)
 
     stream_listen(app->comm.rx_stream, 0, HAL_USBD);
 
-    printf("USB start\n");
+#if (APP_COMM_DEBUG)
+    printf("COMM: start\n");
+#endif // APP_COMM_DEBUG
 }
 
 static void comm_usb_stop(APP* app)
@@ -43,7 +45,9 @@ static void comm_usb_stop(APP* app)
         stream_close(app->comm.rx);
         app->comm.rx = app->comm.tx = app->comm.rx_stream = INVALID_HANDLE;
         app->comm.active = false;
-        printf("USB stop\n");
+#if (APP_COMM_DEBUG)
+        printf("COMM: stop\n");
+#endif // APP_COMM_DEBUG
     }
 }
 
@@ -83,24 +87,9 @@ static inline void comm_usbd_stream_rx(APP* app, unsigned int size)
     stream_listen(app->comm.rx_stream, 0, HAL_USBD);
 }
 
-void comm_connect(APP* app)
-{
-    gpio_set_pin(A15);
-}
-
-void comm_disconnect(APP* app)
-{
-    gpio_reset_pin(A15);
-}
-
-
 void comm_init(APP *app)
 {
-    gpio_enable_pin(A15, GPIO_MODE_OUT);
     app->comm.rx = app->comm.tx = app->comm.rx_stream = INVALID_HANDLE;
-    //setup >usbd
-    comm_disconnect(app);
-
     app->usbd = usbd_create(USB_PORT_NUM, USBD_PROCESS_SIZE, USBD_PROCESS_PRIORITY);
 
     ack(app->usbd, HAL_REQ(HAL_USBD, USBD_REGISTER_HANDLER), 0, 0, 0);
@@ -114,7 +103,10 @@ void comm_init(APP *app)
     usbd_register_const_descriptor(app->usbd, &__STRING_DEFAULT, 4, 0x0409);
 
     ack(app->usbd, HAL_REQ(HAL_USBD, IPC_OPEN), USB_PORT_NUM, 0, 0);
-    printf("Comm init\n");
+
+#if (APP_COMM_DEBUG)
+    printf("COMM: init\n");
+#endif // APP_COMM_DEBUG
 }
 
 void comm_request(APP* app, IPC* ipc)

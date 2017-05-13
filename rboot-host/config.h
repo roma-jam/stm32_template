@@ -43,4 +43,17 @@
 
 #define TEST_ROUNDS                                 10000
 
+
+#define APP_DEBUG                                   1
+
+#if (APP_DEBUG)
+#define APP_COMM_DEBUG                              1
+
+#endif //  APP_DEBUG
+
+
+
+
+
+
 #endif // CONFIG_H
