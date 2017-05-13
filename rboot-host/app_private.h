@@ -9,7 +9,6 @@
 
 #include "app.h"
 #include "comm.h"
-#include "net.h"
 #include <stdint.h>
 
 typedef struct _APP {

@@ -17,6 +17,7 @@
 #include "../rexos/userspace/gpio.h"
 #include "app_private.h"
 #include "comm.h"
+#include "led.h"
 #include "config.h"
 
 //#include "cc11xx/cc1101.h"
@@ -79,7 +80,8 @@ static inline void app_init(APP* app)
     process_create(&__STM32_CORE);
 #if (APP_DEBUG)
     app_setup_dbg();
-    stat();
+//    stat();
+    printf("RBoot, CPU %d MHz\n", power_get_core_clock()/1000000);
 #endif
 }
 
@@ -89,6 +91,7 @@ void app()
     IPC ipc;
 
     app_init(&app);
+    led_init(&app);
 //    comm_init(&app);
 
     for (;;)
