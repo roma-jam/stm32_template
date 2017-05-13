@@ -37,6 +37,9 @@ typedef enum {
 #define SPI_DATA_BO_MSB             (0 << 7)
 #define SPI_DATA_BO_LSB             (1 << 7)
 
+#define SPI_SSI_OFF                 (0 << 8)
+#define SPI_SSI_ON                  (1 << 8)
+
 #define SPI_NSS_HARDWARE            (0 << 9)
 #define SPI_NSS_SOFTWARE            (1 << 9)
 

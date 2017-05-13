@@ -818,13 +818,40 @@
 
 #endif
 
+
+//---------------------------------------------------------------------------- STM32 L1 ----------------------------------------------------------------------------------------------------------
+#if defined(STM32L151C6) || defined(STM32L151C8)
+#define STM32L151xC
+#endif
+
+#if defined(STM32L151C8)
+// 64K
+#define FLASH_SIZE          0x10000
+#endif
+
+#if defined(STM32L151xC)
+#define STM32L1
+// 10K
+#define SRAM_SIZE           0x2800
+// 4K
+#define EEPROM_SZIE         0x1000
+
+#define GPIO_COUNT          3
+#define UARTS_COUNT         3
+#define DAC_CHANNELS_COUNT  2
+
+#if defined(STM32L151xC)
+#define IRQ_VECTORS_COUNT   30
+#endif
+
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#if defined(STM32F1) || defined(STM32F2) || defined(STM32F4)
+#if defined(STM32F1) || defined(STM32F2) || defined(STM32F4) \
+||  defined(STM32L1)
 #define STM32
 #ifndef CORTEX_M3
 #define CORTEX_M3
 #endif
-#endif //STM32F1 || STM32F2 || STM32F4
+#endif // STM32F1 || STM32F2 || STM32F4 || STM32L1
 
 #if defined(STM32L0) || defined(STM32F0)
 #define STM32
@@ -848,6 +875,7 @@
 #undef FLASH_BASE
 
 #include "stm32_config.h"
+
 #if defined(STM32F0)
 #include "stm32f0xx.h"
 #elif defined(STM32F1)
@@ -858,6 +886,8 @@
 #include "stm32f4xx.h"
 #elif defined(STM32L0)
 #include "stm32l0xx.h"
+#elif defined(STM32L1)
+#include "stm32l1xx.h"
 #endif
 
 #endif //!defined(LDS) && !defined(__ASSEMBLER__)

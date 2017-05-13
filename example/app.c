@@ -109,9 +109,6 @@ void app()
 
     cc1101_hw_init(&cc1101);
 
-    sleep_ms(1000);
-    process_info();
-
     for (;;)
     {
         ipc_read(&ipc);

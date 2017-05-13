@@ -17,8 +17,8 @@
 #define CC1101_CLK_PIN                          A5
 #define CC1101_MISO_PIN                         A6
 #define CC1101_MOSI_PIN                         A7
-#define CC1101_GDO0_PIN                         A8
-#define CC1101_GDO2_PIN                         A9
+#define CC1101_GDO0_PIN                         A2
+#define CC1101_GDO2_PIN                         A3
 
 #define CC1101_IO_SIZE                          64
 

@@ -215,7 +215,7 @@ void cc1101_info(CC1101* cc1101)
 void cc1101_hw_init(CC1101* cc1101)
 {
 #if (CC1101_DEBUG_INFO)
-    printf("CC1101: init\n");
+//    printf("CC1101: init\n");
 #endif // CC1101_DEBUG_INFO
     cc1101->active = false;
 
@@ -228,7 +228,7 @@ void cc1101_hw_init(CC1101* cc1101)
 
     cc1101_cs_hi();
 
-    if(!spi_open(CC1101_SPI, SPI_MODE_MASTER | SPI_DATA_CK_IDLE_LOW | SPI_DATA_FIRST_EDGE | SPI_BAUDRATE_DIV4))
+    if(!spi_open(CC1101_SPI, SPI_MODE_MASTER | SPI_DATA_BO_LSB | SPI_NSS_SOFTWARE | SPI_SSI_ON | SPI_DATA_CK_IDLE_LOW | SPI_DATA_FIRST_EDGE | SPI_BAUDRATE_DIV256))
     {
 #if (CC1101_DEBUG_ERRORS)
     printf("CC1101: spi open failure\n");
@@ -261,13 +261,13 @@ void cc1101_hw_init(CC1101* cc1101)
         return;
     }
 
-    if(!cc1101_rf_config(cc1101))
-    {
-#if (CC1101_DEBUG_ERRORS)
-        printf("CC1101: flush rx failure\n");
-#endif // CC1101_DEBUG_ERRORS
-        return;
-    }
+//    if(!cc1101_rf_config(cc1101))
+//    {
+//#if (CC1101_DEBUG_ERRORS)
+//        printf("CC1101: flush rx failure\n");
+//#endif // CC1101_DEBUG_ERRORS
+//        return;
+//    }
 
 #if (CC1101_DEBUG_INFO)
     cc1101_info(cc1101);

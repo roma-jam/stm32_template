@@ -50,9 +50,7 @@ static void stm32_spi_on_status_isr(SPI* spi, SPI_PORT port)
     if(__SPI_REGS[port]->SR & SPI_SR_UDR)
         iprintd("spi %d underrun\n", port);
     if(__SPI_REGS[port]->SR & SPI_SR_TXE)
-    {
         iprintd("spi %d txe\n", port);
-    }
     if(__SPI_REGS[port]->SR & SPI_SR_RXNE)
         iprintd("spi %d rxne\n", port);
 }
@@ -74,6 +72,7 @@ static inline void stm32_spi_on_rx_isr(SPI* spi, SPI_PORT port)
 
 static inline void stm32_spi_on_tx_isr(SPI* spi, SPI_PORT port)
 {
+//    iprintd("spi tx isr %d\n", spi->tx_length);
     if(spi->tx_length-- > 0)
         __SPI_REGS[port]->DR = *(uint8_t*)(io_data(spi->io) + (spi->io->data_size - spi->tx_length));
 }
@@ -108,7 +107,6 @@ void stm32_spi_on_isr(int vector, void* param)
 
 void stm32_spi_open(CORE* core, SPI_PORT port, unsigned int settings)
 {
-    printd("spi open\n");
     SPI* spi = core->spi.spis[port];
     if (spi)
     {
