@@ -827,21 +827,23 @@
 #if defined(STM32L151C8)
 // 64K
 #define FLASH_SIZE          0x10000
-#endif
-
-#if defined(STM32L151xC)
-#define STM32L1
 // 10K
 #define SRAM_SIZE           0x2800
 // 4K
 #define EEPROM_SZIE         0x1000
-
-#define GPIO_COUNT          3
-#define UARTS_COUNT         3
-#define DAC_CHANNELS_COUNT  2
+#endif
 
 #if defined(STM32L151xC)
-#define IRQ_VECTORS_COUNT   30
+#define STM32L1
+#define GPIO_COUNT          4
+#define UARTS_COUNT         3
+#define SPI_COUNT           2
+#define I2C_COUNT           2
+#define DAC_CHANNELS_COUNT  2
+#endif
+
+#if defined(STM32L151xC)
+#define IRQ_VECTORS_COUNT   45
 #endif
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -62,7 +62,7 @@ static inline void stat()
 static inline void app_setup_dbg()
 {
     BAUD baudrate;
-    pin_enable(DBG_CONSOLE_TX_PIN, STM32_GPIO_MODE_OUTPUT_AF_PUSH_PULL_50MHZ, false);
+    pin_enable(DBG_CONSOLE_TX_PIN, STM32_GPIO_MODE_AF, AF7);
     uart_open(DBG_CONSOLE, UART_MODE_STREAM | UART_TX_STREAM);
     baudrate.baud = DBG_CONSOLE_BAUD;
     baudrate.data_bits = 8;
@@ -79,7 +79,8 @@ static inline void app_init(APP* app)
     process_create(&__STM32_CORE);
     app_setup_dbg();
 
-//    printf("App init\n");
+    stat();
+
 }
 
 void app()

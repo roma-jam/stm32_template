@@ -13,7 +13,7 @@
 #define STM32_WDT_DRIVER                        0
 #define STM32_EEP_DRIVER                        0
 #define STM32_I2C_DRIVER                        0
-#define STM32_SPI_DRIVER                        1
+#define STM32_SPI_DRIVER                        0
 #define STM32_UART_DRIVER                       1
 #define STM32_RTC_DRIVER                        0
 #define STM32_USB_DRIVER                        0
@@ -32,19 +32,23 @@
 //save few bytes here
 #define STM32_DECODE_RESET                      0
 //0 meaning HSI. If not defined, 25MHz will be defined by default by ST lib
-#define HSE_VALUE                               8000000
+#define HSE_VALUE                               12000000
 #define HSE_BYPASS                              0
 //0 meaning HSE
 #define LSE_VALUE                               32768
-//STM32L0
+//STM32L0 || STM32L
 #define MSI_RANGE                               6
 
-//STM32F1, F0
+#if defined(STM32F1) || defined(STM32F0)
 #define PLL_MUL                                 6
 #define PLL_DIV                                 1
-//STM32L0
-//#define PLL_MUL                                 12
-//#define PLL_DIV                                 3
+#endif
+
+#if defined(STM32L1) || defined(STM32L0)
+#define PLL_MUL                                 8
+#define PLL_DIV                                 4
+#endif
+
 //STM32F10X_CL only
 // use PLL2 as clock source for main PLL. Set to 0 to disable
 #define PLL2_DIV                                0
@@ -59,7 +63,7 @@
 //------------------------------ TIMER -----------------------------------------------
 #define HPET_TIMER                              TIM_2
 //only required if no STM32_RTC_DRIVER is set
-#define SECOND_PULSE_TIMER                      TIM_3
+#define SECOND_PULSE_TIMER                      TIM_11
 //disable to save few bytes
 #define TIMER_IO                                1
 //------------------------------- ADC ------------------------------------------------

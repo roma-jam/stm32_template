@@ -1,2 +1,4 @@
 example/build/
 example/output/
+rboot-host/build/
+rboot-host/output/stm32_template.bin
