@@ -81,7 +81,7 @@ static inline void app_init(APP* app)
 #if (APP_DEBUG)
     app_setup_dbg();
 //    stat();
-    printf("RBoot, CPU %d MHz\n", power_get_core_clock()/1000000);
+    printf("RBoot Host, CPU %d MHz\n", power_get_core_clock()/1000000);
 #endif
 }
 
@@ -92,13 +92,18 @@ void app()
 
     app_init(&app);
     led_init(&app);
-//    comm_init(&app);
+    led_mode(&app, LED_COLOR_WHITE, LED_MODE_ON);
+
+    comm_init(&app);
 
     for (;;)
     {
         ipc_read(&ipc);
         switch (HAL_GROUP(ipc.cmd))
         {
+        case HAL_USBD:
+            comm_request(&app, &ipc);
+            break;
         default:
             error(ERROR_NOT_SUPPORTED);
             break;

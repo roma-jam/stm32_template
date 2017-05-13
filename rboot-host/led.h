@@ -9,6 +9,7 @@
 #define LED_H_
 
 #include "app.h"
+#include "../rexos/userspace/types.h"
 #include "config.h"
 
 typedef enum {
@@ -18,13 +19,23 @@ typedef enum {
 } LED_MODE;
 
 typedef enum {
-    LED_WHITE = 0,
-    LED_BLUE,
-    LED_MAX
-} LED;
+    LED_COLOR_WHITE = 0,
+    LED_COLOR_BLUE,
+    LED_COLOR_MAX
+} LED_COLOR;
+
+typedef struct {
+    bool is_on;
+    LED_MODE mode;
+    uint8_t pin;
+} LED_SETUP;
+
+typedef struct {
+    LED_SETUP set[LED_COLOR_MAX];
+} LEDS;
 
 void led_init(APP* app);
-void led_mode(APP* app, LED led, LED_MODE mode);
+void led_mode(APP* app, LED_COLOR color, LED_MODE mode);
 
 
 #endif /* LED_H_ */

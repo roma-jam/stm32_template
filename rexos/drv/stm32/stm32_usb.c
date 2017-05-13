@@ -68,14 +68,14 @@ static inline void memcpy16(void* dst, void* src, unsigned int size)
 {
     int i;
     size = (size + 1) / 2;
-#if defined(STM32F1)
+#if defined(STM32F1) || defined(STM32L1)
     if(((uint32_t)dst & 0xFFFFF000)==USB_PMAADDR) dst=(void*)((uint32_t)dst + ((uint32_t)dst & 0x00000FFF));
     if(((uint32_t)src & 0xFFFFF000)==USB_PMAADDR) src=(void*)((uint32_t)src + ((uint32_t)src & 0x00000FFF));
 #endif
     for (i = 0; i < size; ++i)
     {
         ((uint16_t*)dst)[i] = ((uint16_t*)src)[i];
-#if defined(STM32F1)
+#if defined(STM32F1) || defined(STM32L1)
         if(((uint32_t)dst & 0xFFFFF000)==USB_PMAADDR)
             dst=(void*)((uint32_t)dst + 2);
         else
@@ -349,7 +349,7 @@ void stm32_usb_open_device(CORE* core, HANDLE device)
 #endif //HSE_VALUE
 #endif //STM32F0
 
-    //power up and wait tStartup
+    //power up and wait startup
     USB->CNTR &= ~USB_CNTR_PDWN;
     sleep_us(1);
     USB->CNTR &= ~USB_CNTR_FRES;
@@ -374,7 +374,7 @@ void stm32_usb_open_device(CORE* core, HANDLE device)
     NVIC_SetPriority(USB_IRQn, 13);
 
     //Unmask common interrupts
-    USB->CNTR |= USB_CNTR_SUSPM | USB_CNTR_RESETM | USB_CNTR_CTRM;
+    USB->CNTR |= USB_CNTR_SUSPM | USB_CNTR_WKUPM | USB_CNTR_RESETM | USB_CNTR_CTRM;
 #if (USB_DEBUG_ERRORS)
     USB->CNTR |= USB_CNTR_PMAOVRM | USB_CNTR_ERRM;
 #endif
@@ -408,7 +408,7 @@ static inline void stm32_usb_open_ep(CORE* core, unsigned int num, USB_EP_TYPE t
         if (core->usb.out[i])
             fifo += core->usb.out[i]->mps;
     }
-#if defined(STM32F1)
+#if defined(STM32F1) || defined(STM32L1)
     fifo += sizeof(USB_BUFFER_DESCRIPTOR) * USB_EP_COUNT_MAX / 2;
 #else
     fifo += sizeof(USB_BUFFER_DESCRIPTOR) * USB_EP_COUNT_MAX;

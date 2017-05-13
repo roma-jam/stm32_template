@@ -9,6 +9,7 @@
 
 #include "app.h"
 #include "comm.h"
+#include "led.h"
 #include <stdint.h>
 
 typedef struct _APP {
@@ -16,6 +17,7 @@ typedef struct _APP {
     HANDLE usbd;
 
     COMM comm;
+    LEDS leds;
 } APP;
 
 #endif // APP_PRIVATE_H

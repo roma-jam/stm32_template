@@ -65,7 +65,7 @@
 #define USBD_CDC_ACM_FLOW_CONTROL                           1
 
 #define USBD_CDC_ACM_DEBUG                                  1
-#define USBD_CDC_ACM_DEBUG_FLOW                             1
+#define USBD_CDC_ACM_DEBUG_FLOW                             0
 
 //------------------------ RNDIS Device class -----------------------------------------
 #define USBD_RNDIS_DEBUG                                    1
