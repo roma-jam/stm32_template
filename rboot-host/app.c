@@ -28,7 +28,7 @@ const REX __APP = {
     //name
     "App main",
     //size
-    512,
+    900,
     //priority
     200,
     //flags
@@ -92,8 +92,6 @@ void app()
 
     app_init(&app);
     led_init(&app);
-    led_mode(&app, LED_COLOR_WHITE, LED_MODE_ON);
-
     comm_init(&app);
 
     for (;;)

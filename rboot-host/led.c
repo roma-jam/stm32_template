@@ -22,8 +22,8 @@ void led_init(APP* app)
         app->leds.set[i].is_on = false;
         app->leds.set[i].mode = LED_MODE_OFF;
         gpio_enable_pin(app->leds.set[i].pin, GPIO_MODE_OUT);
+        gpio_reset_pin(app->leds.set[i].pin);
     }
-
 
 #if (APP_LED_DEBUG)
     printf("LED: init\n");
@@ -54,6 +54,8 @@ void led_mode(APP* app, LED_COLOR color, LED_MODE mode)
     switch(mode)
     {
         case LED_MODE_OFF:
+            gpio_reset_pin(app->leds.set[color].pin);
+            app->leds.set[color].is_on = false;
             break;
         case LED_MODE_ON:
             gpio_set_pin(app->leds.set[color].pin);

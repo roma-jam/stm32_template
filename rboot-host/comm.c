@@ -13,6 +13,7 @@
 #include "../rexos/userspace/stm32/stm32_driver.h"
 #include "../rexos/midware/usbd/usbd.h"
 #include "../rexos/drv/stm32/stm32_usb.h"
+#include "led.h"
 #include "usb_desc.h"
 #include "sys_config.h"
 #include "stm32_config.h"
@@ -22,6 +23,11 @@
 static inline void comm_usb_start(APP* app)
 {
     HANDLE tx_stream;
+
+#if (APP_COMM_DEBUG)
+    printf("COMM: start\n");
+#endif // APP_COMM_DEBUG
+
     tx_stream = get_handle(app->usbd, HAL_REQ(HAL_USBD_IFACE, IPC_GET_TX_STREAM), USBD_IFACE(0, 0), 0, 0);
     app->comm.rx_stream = get_handle(app->usbd, HAL_REQ(HAL_USBD_IFACE, IPC_GET_RX_STREAM), USBD_IFACE(0, 0), 0, 0);
 
@@ -30,24 +36,23 @@ static inline void comm_usb_start(APP* app)
     app->comm.active = true;
 
     stream_listen(app->comm.rx_stream, 0, HAL_USBD);
-
-#if (APP_COMM_DEBUG)
-    printf("COMM: start\n");
-#endif // APP_COMM_DEBUG
+    led_mode(app, LED_COLOR_WHITE, LED_MODE_ON);
 }
 
 static void comm_usb_stop(APP* app)
 {
     if (app->comm.active)
     {
+#if (APP_COMM_DEBUG)
+        printf("COMM: stop\n");
+#endif // APP_COMM_DEBUG
+
         stream_stop_listen(app->comm.rx_stream);
         stream_close(app->comm.tx);
         stream_close(app->comm.rx);
         app->comm.rx = app->comm.tx = app->comm.rx_stream = INVALID_HANDLE;
         app->comm.active = false;
-#if (APP_COMM_DEBUG)
-        printf("COMM: stop\n");
-#endif // APP_COMM_DEBUG
+        led_mode(app, LED_COLOR_WHITE, LED_MODE_OFF);
     }
 }
 
@@ -70,20 +75,14 @@ static inline void comm_usbd_alert(APP* app, USBD_ALERTS alert)
 
 static inline void comm_usbd_stream_rx(APP* app, unsigned int size)
 {
-    printf("rx: %d ", size);
     char c;
     unsigned int i;
     for (i = 0; i < size; ++i)
     {
-        stream_read(app->comm.rx, &c, 1);
-        //echo
-        stream_write(app->comm.tx, &c, 1);
-        if ((uint8_t)c >= ' ' && (uint8_t)c <= '~')
-            printf("%c", c);
-        else
-            printf("\\x%u", (uint8_t)c);
+        stream_read(app->comm.rx, &c, sizeof(char));
+        // echo
+        stream_write(app->comm.tx, &c, sizeof(char));
     }
-    printf("\n");
     stream_listen(app->comm.rx_stream, 0, HAL_USBD);
 }
 
@@ -102,6 +101,7 @@ void comm_init(APP *app)
     usbd_register_const_descriptor(app->usbd, &__STRING_SERIAL, 3, 0x0409);
     usbd_register_const_descriptor(app->usbd, &__STRING_DEFAULT, 4, 0x0409);
 
+    sleep_ms(9);
     ack(app->usbd, HAL_REQ(HAL_USBD, IPC_OPEN), USB_PORT_NUM, 0, 0);
 
 #if (APP_COMM_DEBUG)
